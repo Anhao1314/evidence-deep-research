@@ -54,11 +54,11 @@ class HeuristicProvider:
                         query=self._query_for(match.topic, obj),
                     )
                 )
-        return Plan(
-            plan_id=self._new_id(),
-            subtasks=subtasks,
-            rationale=f"启发式规则：命中主题 {match.topic}，对象 {objects or '（泛型）'}",
-        )
+        rationale = f"启发式规则：命中主题 {match.topic}，对象 {objects or '（泛型）'}"
+        if ctx.related_history:
+            hist = "；".join(h["question"] for h in ctx.related_history)
+            rationale += f"；记忆召回相关历史研究：{hist}"
+        return Plan(plan_id=self._new_id(), subtasks=subtasks, rationale=rationale)
 
     def _plan_replan(self, ctx: PlanContext) -> Plan:
         subtasks: list[SubTask] = []

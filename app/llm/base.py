@@ -15,6 +15,8 @@ from app.schema.report import Citation
 class PlanContext:
     question: str
     preferences: dict[str, str] = field(default_factory=dict)
+    # 记忆召回的相关历史主题（question, summary），避免重复研究并供 trace 审计
+    related_history: list[dict] = field(default_factory=list)
     # replan 时聚焦的缺口：[{"topic","object","missing_aspects":[...]}]
     replan_focus: list[dict] = field(default_factory=list)
 
@@ -30,6 +32,7 @@ class ComposeContext:
 @dataclass
 class ComposeResult:
     markdown: str
+    summary: str = ""
     citations: list[Citation] = field(default_factory=list)
     sources: list = field(default_factory=list)  # list[Source]，去重合并后的来源清单
 

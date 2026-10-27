@@ -52,6 +52,9 @@ class OpenAICompatProvider:
             for t in self.registry.topics.values()
         )
         parts = [f"研究问题：{ctx.question}", f"已知主题域：{topics}"]
+        if ctx.related_history:
+            hist = "; ".join(h.get("question", "") for h in ctx.related_history)
+            parts.append(f"该用户的相关历史研究（避免重复、可复用结论）：{hist}")
         if ctx.replan_focus:
             parts.append(f"上轮信息缺口：{json.dumps(ctx.replan_focus, ensure_ascii=False)}")
         return "\n".join(parts)
@@ -92,8 +95,21 @@ class OpenAICompatProvider:
             ),
             user=f"研究问题：{ctx.question}\n\n证据清单：\n" + "\n".join(evidence_lines),
         )
-        return ComposeResult(markdown=md, citations=self._extract_citations(md, ctx.evidences),
-                             sources=collect_sources(list(ctx.evidences)))
+        return ComposeResult(
+            markdown=md,
+            summary=self._first_paragraph(md),
+            citations=self._extract_citations(md, ctx.evidences),
+            sources=collect_sources(list(ctx.evidences)),
+        )
+
+    @staticmethod
+    def _first_paragraph(markdown: str) -> str:
+        """取标题之后的第一个非空段落作为摘要（M3 引用 guard 时进一步结构化）。"""
+        lines = [ln.strip() for ln in markdown.splitlines() if ln.strip()]
+        for line in lines:
+            if not line.startswith("#"):
+                return line[:300]
+        return ""
 
     def _extract_citations(self, markdown: str, evidences: list[Evidence]) -> list[Citation]:
         """从生成的 markdown 抽取 [E#] 引用；非法编号在 M3 的 guard 中处理。"""

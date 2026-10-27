@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field
 
-from app.schema.evidence import Source
+from app.schema.evidence import Evidence, Source
 
 
 class Citation(BaseModel):
@@ -28,6 +28,10 @@ class Report(BaseModel):
     question: str
     trace_id: str = Field(description="与 trace 关联（M3 起写入 trace store）")
     markdown: str
+    summary: str = Field(default="", description="结论摘要纯文本（记忆沉淀与列表展示用）")
     sources: list[Source]
     citations: list[Citation]
+    evidences: list[Evidence] = Field(
+        default_factory=list, description="编号后的最终证据明细（记忆沉淀与评测断言的输入）"
+    )
     meta: ReportMeta

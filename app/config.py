@@ -27,6 +27,12 @@ class Settings(BaseSettings):
     # 数据目录（内置演示语料）
     kb_corpus_dir: Path = PROJECT_ROOT / "data" / "corpus"
     web_demo_dir: Path = PROJECT_ROOT / "data" / "web_demo"
+    memory_db_path: Path = PROJECT_ROOT / "data" / "memory.sqlite3"
+
+    # 知识库检索路：true = 自研 MCP Server（stdio 子进程，真实跨进程）
+    mcp_kb_enabled: bool = True
+    mcp_connect_timeout: float = 30.0
+    mcp_call_timeout: float = 30.0
 
     @property
     def offline(self) -> bool:
