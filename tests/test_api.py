@@ -48,6 +48,26 @@ def test_question_validation(client):
     assert resp.status_code == 422
 
 
+def test_trace_endpoint_and_report_persistence(client):
+    """trace 事件流查询 + 报告落库回查（API 装配路径）。"""
+    research = client.post("/api/research", json={"question": "Qdrant 和 Milvus 怎么选？"})
+    assert research.status_code == 201
+    trace_id = research.json()["trace_id"]
+
+    resp = client.get(f"/api/traces/{trace_id}")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["event_count"] > 0 and body["trace_id"] == trace_id
+    types = [e["event_type"] for e in body["events"]]
+    assert "plan" in types and "tool_call" in types and "synthesize" in types
+    assert client.get("/api/traces/run-nonexistent").status_code == 404
+
+    # 报告持久化：绕过进程内缓存（新实例语义）走 SQLite 回查
+    got = client.get(f"/api/reports/{trace_id}")
+    assert got.status_code == 200
+    assert got.json()["report_id"] == trace_id
+
+
 def test_preference_and_memory_flow(client):
     """偏好设置 -> 研究一次 -> 记忆可见（跨会话记忆的 API 闭环）。"""
     resp = client.post(
