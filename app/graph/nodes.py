@@ -30,11 +30,20 @@ def _aspect_rank(aspect: str) -> int:
     return _ASPECT_ORDER.index(aspect) if aspect in _ASPECT_ORDER else 99
 
 
-def make_load_context_node(settings: Settings, memory: "MemoryStore"):
+def make_load_context_node(settings: Settings, memory: "MemoryStore", trace_store=None):
     """记忆召回：偏好全量注入 + 历史主题/结论按 BM25 相似度召回（跨会话长期记忆）。"""
 
     def load_context(state: dict) -> dict:
         recall = memory.recall(state.get("user_id", "default"), state["question"])
+        if trace_store is not None:
+            trace_store.record(
+                state.get("run_id", ""), node="load_context", event_type="memory_recall",
+                payload={
+                    "preferences": recall.preferences,
+                    "related_topics": len(recall.related_topics),
+                    "snippets": len(recall.snippets),
+                },
+            )
         return {
             "preferences": recall.preferences,
             "related_history": [
@@ -46,18 +55,30 @@ def make_load_context_node(settings: Settings, memory: "MemoryStore"):
     return load_context
 
 
-def make_plan_node(provider: LLMProvider, settings: Settings):
+def make_plan_node(provider: LLMProvider, settings: Settings, trace_store=None):
     def plan(state: dict) -> dict:
         ctx = PlanContext(
             question=state["question"],
             preferences=state.get("preferences", {}),
             related_history=state.get("related_history", []),
             replan_focus=state.get("replan_focus", []),
+            trace_id=state.get("run_id"),
         )
         plan = provider.plan(ctx)
         history = list(state.get("plan_history", []))
         duplicate = is_duplicate_plan(plan, history)
         history.append(plan.signature())
+        if trace_store is not None:
+            trace_store.record(
+                state.get("run_id", ""), node="plan", event_type="plan",
+                payload={
+                    "plan_id": plan.plan_id,
+                    "subtasks": [t.model_dump() for t in plan.subtasks],
+                    "rationale": plan.rationale[:200],
+                    "is_duplicate": duplicate,
+                    "round": state.get("plan_rounds", 0) + 1,
+                },
+            )
         return {
             "plan": plan,
             "plan_history": history,
@@ -70,7 +91,7 @@ def make_plan_node(provider: LLMProvider, settings: Settings):
     return plan
 
 
-def make_dispatch_router(settings: Settings):
+def make_dispatch_router(settings: Settings, trace_store=None):
     """plan 之后的条件边：护栏判定 -> synthesize；否则用 Send API 动态扇出子任务。
 
     LangGraph 1.x 中 Send 列表须从条件边 router 返回（节点返回 Send 已废弃），
@@ -88,26 +109,49 @@ def make_dispatch_router(settings: Settings):
         sends: list[Send] = []
         for subtask in plan.subtasks:
             target = "rag_agent" if subtask.route == "kb" else "web_agent"
-            payload: SubAgentState = {"subtask": subtask, "question": state["question"]}
+            payload: SubAgentState = {
+                "subtask": subtask,
+                "question": state["question"],
+                "trace_id": state.get("run_id", ""),
+            }
             sends.append(Send(target, payload))
+        if trace_store is not None:
+            trace_store.record(
+                state.get("run_id", ""), node="dispatch", event_type="dispatch",
+                payload={
+                    "fan_out": len(sends),
+                    "targets": [s.node for s in sends],
+                    "subtask_ids": [t.subtask_id for t in plan.subtasks],
+                },
+            )
         return sends
 
     return dispatch
 
 
-def make_merge_node(settings: Settings):
+def make_merge_node(settings: Settings, trace_store=None):
     def merge(state: dict) -> dict:
-        evidences = _dedupe_and_assign(list(state.get("raw_evidences", [])), settings.evidence_budget)
+        raw = list(state.get("raw_evidences", []))
+        deduped = _dedupe_and_assign(raw, settings.evidence_budget)
         # 记忆偏好可收紧单对象证据上限（跨会话偏好的第二个生效点）
         per_object = int(state.get("preferences", {}).get("max_evidences_per_object", "0") or 0)
-        if per_object > 0:
-            evidences = _cap_per_object(evidences, per_object)
+        evidences = _cap_per_object(deduped, per_object) if per_object > 0 else deduped
         coverage: dict[str, list[str]] = {}
         for ev in evidences:
             key = f"{ev.topic}/{ev.object_name}"
             aspects = set(coverage.get(key, []))
             aspects.add(ev.aspect)
             coverage[key] = sorted(aspects)
+        if trace_store is not None:
+            trace_store.record(
+                state.get("run_id", ""), node="merge", event_type="merge",
+                payload={
+                    "raw_evidences": len(raw),
+                    "deduped": len(deduped),
+                    "after_budget_and_prefs": len(evidences),
+                    "coverage": coverage,
+                },
+            )
         return {"evidences": evidences, "coverage": coverage,
                 "step_count": state.get("step_count", 0) + 1}
 
@@ -154,7 +198,7 @@ def _dedupe_and_assign(evidences: list[Evidence], budget: int) -> list[Evidence]
     return out[:budget]
 
 
-def make_verify_node(registry: DomainRegistry, settings: Settings):
+def make_verify_node(registry: DomainRegistry, settings: Settings, trace_store=None):
     def verify(state: dict) -> dict:
         coverage = state.get("coverage", {})
         plan: Plan = state["plan"]
@@ -191,6 +235,11 @@ def make_verify_node(registry: DomainRegistry, settings: Settings):
             for g in gaps
             if g["missing_aspects"]
         ]
+        if trace_store is not None:
+            trace_store.record(
+                state.get("run_id", ""), node="verify", event_type="verify",
+                payload={"gaps": [g["text"] for g in gaps], "replan": bool(replan_focus)},
+            )
         return {"information_gaps": [g["text"] for g in gaps],
                 "replan_focus": replan_focus,
                 "step_count": state.get("step_count", 0) + 1}
@@ -210,7 +259,7 @@ def route_after_verify(state: dict, settings: Settings) -> str:
     return "plan"
 
 
-def make_synthesize_node(provider: LLMProvider, settings: Settings):
+def make_synthesize_node(provider: LLMProvider, settings: Settings, trace_store=None):
     def synthesize(state: dict) -> dict:
         evidences = list(state.get("evidences", []))
         run_id = state.get("run_id") or f"run-{uuid.uuid4().hex[:12]}"
@@ -219,6 +268,7 @@ def make_synthesize_node(provider: LLMProvider, settings: Settings):
             evidences=evidences,
             information_gaps=state.get("information_gaps", []),
             preferences=state.get("preferences", {}),
+            trace_id=run_id,
         )
         result = provider.compose(ctx)
         plan: Plan = state["plan"]
@@ -237,23 +287,39 @@ def make_synthesize_node(provider: LLMProvider, settings: Settings):
                 degraded=bool(state.get("route_failures")),
                 plan_rounds=state.get("plan_rounds", 0),
                 step_count=state.get("step_count", 0),
-                token_usage=0,  # M3 随 Trace 落账
+                token_usage=0,  # 在线模式由 provider 层 usage 事件落 trace
                 information_gaps=state.get("information_gaps", []),
             ),
         )
+        if trace_store is not None:
+            trace_store.record(
+                run_id, node="synthesize", event_type="synthesize",
+                payload={
+                    "markdown_chars": len(result.markdown),
+                    "citations": len(result.citations),
+                    "evidences": len(evidences),
+                    "sources": len(report.sources),
+                    "degraded": report.meta.degraded,
+                },
+            )
         return {"report": report, "run_id": run_id,
                 "step_count": state.get("step_count", 0) + 1}
 
     return synthesize
 
 
-def make_persist_node(memory: "MemoryStore"):
+def make_persist_node(memory: "MemoryStore", trace_store=None):
     """记忆沉淀：报告落定后写入长期记忆（只沉淀有证据支撑的结论）。"""
 
     def persist(state: dict) -> dict:
         report = state.get("report")
         if report is not None:
             memory.record_research(state.get("user_id", "default"), state["question"], report)
+            if trace_store is not None:
+                trace_store.record(
+                    state.get("run_id", ""), node="persist", event_type="persist",
+                    payload={"topic_recorded": True, "snippets": len(report.evidences)},
+                )
         return {"step_count": state.get("step_count", 0) + 1}
 
     return persist

@@ -1,30 +1,59 @@
-"""知识库 RAG 子 Agent：检索（经 KBClient）-> 证据抽取。
+"""知识库 RAG 子 Agent：检索（经 KBClient，真实 MCP 调用）-> 证据抽取。
 
-M1 走 InProcessKBClient；M2 知识库检索迁入自研 MCP Server 后，
-仅需把 KBClient 实现换成 McpKBClient（stdio 跨进程），子图逻辑零改动。
+检索事件（tool_call/tool_result/retry/degrade）落 trace；
+M2 前走 InProcessKBClient，MCP 化后本子图零改动——事件名不变。
 """
+
+import time
 
 from langgraph.graph.state import CompiledStateGraph
 
-from app.agents.base import SubAgentState, build_retrieval_agent, fetch_with_retry, first_sentence, route_failure
+from app.agents.base import (
+    SubAgentState,
+    build_retrieval_agent,
+    fetch_with_retry,
+    first_sentence,
+    route_failure,
+)
 from app.config import Settings
 from app.schema.evidence import Evidence, Source
 from app.tools.kb_client import KBClient
+from app.trace.store import TraceStore
 
 RAG_TOP_K = 8  # 覆盖单对象全部研究维度（4 aspect）+ 对比性基准文档，保证领域内问题首轮收敛
 
 
-def build_rag_agent(kb_client: KBClient, settings: Settings) -> CompiledStateGraph:
+def build_rag_agent(
+    kb_client: KBClient, settings: Settings, trace_store: TraceStore | None = None
+) -> CompiledStateGraph:
     def retrieve(state: SubAgentState) -> dict:
         subtask = state["subtask"]
+        trace_id = state.get("trace_id")
+
+        def _trace(event_type: str, payload: dict) -> None:
+            if trace_store is not None and trace_id:
+                trace_store.record(trace_id, node="rag_agent", event_type=event_type, payload=payload)
+
+        def _on_retry(attempt: int, error: str) -> None:
+            _trace("retry", {"route": "kb", "subtask_id": subtask.subtask_id, "attempt": attempt, "error": error})
+
+        _trace("tool_call", {"route": "kb", "tool": "kb_search", "subtask_id": subtask.subtask_id,
+                             "query": subtask.query, "top_k": RAG_TOP_K})
+        started = time.monotonic()
         result, error = fetch_with_retry(
             lambda: kb_client.search(subtask.query, top_k=RAG_TOP_K, topic=subtask.topic or None),
             max_retries=settings.tool_max_retries,
             base_delay=settings.tool_retry_base_delay,
+            on_retry=_on_retry,
         )
+        latency_ms = round((time.monotonic() - started) * 1000, 2)
         if error is not None:
+            _trace("degrade", {"route": "kb", "subtask_id": subtask.subtask_id, "latency_ms": latency_ms,
+                               "error": error})
             return {"hits": [], "route_failures": [route_failure(subtask, error)]}
-        return {"hits": result, "attempts": settings.tool_max_retries + 1}
+        _trace("tool_result", {"route": "kb", "tool": "kb_search", "hits": len(result or []),
+                               "latency_ms": latency_ms})
+        return {"hits": result or [], "attempts": settings.tool_max_retries + 1}
 
     def extract(state: SubAgentState) -> dict:
         subtask = state["subtask"]

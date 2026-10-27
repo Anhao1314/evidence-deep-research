@@ -1,7 +1,7 @@
 """子 Agent 公共骨架：统一 state 形状、重试与失败降级约定。
 
 子 Agent 是可独立 invoke 的 LangGraph 子图（retrieve -> extract 两个节点）：
-- 作为主图节点时，只向主图回写 evidences / route_failures 两个 key；
+- 作为主图节点时，只向主图回写 raw_evidences / route_failures 两个 key；
 - 单独 invoke 时返回完整内部 state，便于独立测试与调试。
 """
 
@@ -20,6 +20,7 @@ T = TypeVar("T")
 class SubAgentState(TypedDict, total=False):
     subtask: SubTask
     question: str
+    trace_id: str
     hits: list  # 检索中间产物（ScoredDoc / WebHit）
     evidences: list  # list[Evidence]
     route_failures: list  # list[dict]
@@ -27,11 +28,16 @@ class SubAgentState(TypedDict, total=False):
 
 
 def fetch_with_retry(
-    fetch: Callable[[], T], *, max_retries: int, base_delay: float
+    fetch: Callable[[], T],
+    *,
+    max_retries: int,
+    base_delay: float,
+    on_retry: Callable[[int, str], None] | None = None,
 ) -> tuple[T | None, str | None]:
     """指数退避重试：成功返回 (结果, None)；耗尽后返回 (None, 错误描述)。
 
     失败不上抛：由调用方写 route_failures 走降级路径，不阻塞主图。
+    on_retry(attempt, error) 在每次失败后立即回调（trace 记录用）。
     """
     last_error: str | None = None
     for attempt in range(max_retries + 1):
@@ -39,6 +45,8 @@ def fetch_with_retry(
             return fetch(), None
         except Exception as exc:  # noqa: BLE001 —— 工具失败一律降级，不区分异常类型
             last_error = f"第{attempt + 1}次尝试失败: {exc}"
+            if on_retry is not None:
+                on_retry(attempt, last_error)
             if attempt < max_retries:
                 time.sleep(base_delay * (2**attempt))
     return None, last_error
@@ -89,7 +97,11 @@ def as_graph_node(compiled_subgraph: CompiledStateGraph) -> Callable[[dict], dic
 
     def run(payload: dict) -> dict:
         final = compiled_subgraph.invoke(
-            {"subtask": payload["subtask"], "question": payload.get("question", "")}
+            {
+                "subtask": payload["subtask"],
+                "question": payload.get("question", ""),
+                "trace_id": payload.get("trace_id", ""),
+            }
         )
         return {
             "raw_evidences": final.get("evidences", []),

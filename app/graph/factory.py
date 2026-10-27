@@ -35,7 +35,8 @@ from app.llm.base import LLMProvider
 from app.llm.heuristic import HeuristicProvider
 from app.memory.store import MemoryStore
 from app.tools.kb_client import InProcessKBClient, KBClient
-from app.tools.search import DemoSearchProvider
+from app.tools.search import DemoSearchProvider, SearchProvider
+from app.trace.store import TraceStore
 from knowledge_base.retriever import KBRetriever
 
 
@@ -47,37 +48,42 @@ class ResearchRuntime:
     settings: Settings
     memory: MemoryStore
     kb_client: KBClient
+    trace: TraceStore
 
     def close(self) -> None:
         close_kb = getattr(self.kb_client, "close", None)
         if close_kb is not None:
             close_kb()
         self.memory.close()
+        self.trace.close()
 
 
 def build_research_app(
     *,
     settings: Settings,
     kb_client: KBClient,
-    search_provider: DemoSearchProvider,
+    search_provider: SearchProvider,
     llm_provider: LLMProvider,
     registry: DomainRegistry,
     memory_store: MemoryStore,
+    trace_store: TraceStore | None = None,
 ) -> CompiledStateGraph:
     graph = StateGraph(ResearchState)
 
-    graph.add_node("load_context", make_load_context_node(settings, memory_store))
-    graph.add_node("plan", make_plan_node(llm_provider, settings))
-    graph.add_node("rag_agent", as_graph_node(build_rag_agent(kb_client, settings)))
-    graph.add_node("web_agent", as_graph_node(build_web_agent(search_provider, settings)))
-    graph.add_node("merge", make_merge_node(settings))
-    graph.add_node("verify", make_verify_node(registry, settings))
-    graph.add_node("synthesize", make_synthesize_node(llm_provider, settings))
-    graph.add_node("persist", make_persist_node(memory_store))
+    graph.add_node("load_context", make_load_context_node(settings, memory_store, trace_store))
+    graph.add_node("plan", make_plan_node(llm_provider, settings, trace_store))
+    graph.add_node("rag_agent", as_graph_node(build_rag_agent(kb_client, settings, trace_store)))
+    graph.add_node("web_agent", as_graph_node(build_web_agent(search_provider, settings, trace_store)))
+    graph.add_node("merge", make_merge_node(settings, trace_store))
+    graph.add_node("verify", make_verify_node(registry, settings, trace_store))
+    graph.add_node("synthesize", make_synthesize_node(llm_provider, settings, trace_store))
+    graph.add_node("persist", make_persist_node(memory_store, trace_store))
 
     graph.add_edge(START, "load_context")
     graph.add_edge("load_context", "plan")
-    graph.add_conditional_edges("plan", make_dispatch_router(settings), {"synthesize": "synthesize"})
+    graph.add_conditional_edges(
+        "plan", make_dispatch_router(settings, trace_store), {"synthesize": "synthesize"}
+    )
     graph.add_edge("rag_agent", "merge")
     graph.add_edge("web_agent", "merge")
     graph.add_edge("merge", "verify")
@@ -89,19 +95,6 @@ def build_research_app(
     graph.add_edge("synthesize", "persist")
     graph.add_edge("persist", END)
     return graph.compile()
-
-
-def _build_llm_provider(settings: Settings, registry: DomainRegistry) -> LLMProvider:
-    if settings.offline or not settings.llm_api_key:
-        return HeuristicProvider(registry, max_subtasks=settings.max_subtasks)
-    from app.llm.openai_compat import OpenAICompatProvider
-
-    return OpenAICompatProvider(
-        base_url=settings.llm_base_url,
-        api_key=settings.llm_api_key,
-        model=settings.llm_model,
-        registry=registry,
-    )
 
 
 def _build_kb_client(settings: Settings, retriever: KBRetriever) -> KBClient:
@@ -116,14 +109,51 @@ def _build_kb_client(settings: Settings, retriever: KBRetriever) -> KBClient:
     return InProcessKBClient(retriever)
 
 
+def _build_llm_provider(settings: Settings, registry: DomainRegistry,
+                        trace_store: TraceStore | None) -> LLMProvider:
+    """离线：纯规则 Provider。在线：ResilientProvider 包装
+    （OpenAICompat 主路 + 规则兜底 + 引用 guard），LLM 故障不阻塞研究流程。"""
+    heuristic = HeuristicProvider(registry, max_subtasks=settings.max_subtasks)
+    if settings.offline or not settings.llm_api_key:
+        return heuristic
+
+    from app.llm.openai_compat import OpenAICompatProvider
+    from app.llm.resilient import ResilientProvider
+
+    primary = OpenAICompatProvider(
+        base_url=settings.llm_base_url,
+        api_key=settings.llm_api_key,
+        model=settings.llm_model,
+        registry=registry,
+        max_retries=settings.llm_max_retries,
+        retry_base_delay=settings.llm_retry_base_delay,
+        trace_store=trace_store,
+    )
+    return ResilientProvider(primary, fallback=heuristic, trace_store=trace_store)
+
+
+def _build_search_provider(settings: Settings) -> SearchProvider:
+    if settings.search_provider == "tavily":
+        if not settings.tavily_api_key:
+            raise ValueError("DR_SEARCH_PROVIDER=tavily 需要配置 DR_TAVILY_API_KEY")
+        from app.tools.tavily_search import TavilySearchProvider
+
+        return TavilySearchProvider(
+            api_key=settings.tavily_api_key,
+            timeout=settings.tavily_timeout,
+        )
+    return DemoSearchProvider.from_dir(settings.web_demo_dir)
+
+
 def build_default_app(settings: Settings | None = None) -> ResearchRuntime:
     settings = settings or Settings()
     retriever = KBRetriever.from_dir(settings.kb_corpus_dir)
     registry = DomainRegistry.from_kb_docs(retriever.docs)
     kb_client = _build_kb_client(settings, retriever)
-    search_provider = DemoSearchProvider.from_dir(settings.web_demo_dir)
+    search_provider = _build_search_provider(settings)
     memory_store = MemoryStore(settings.memory_db_path)
-    llm_provider = _build_llm_provider(settings, registry)
+    trace_store = TraceStore(settings.trace_db_path)
+    llm_provider = _build_llm_provider(settings, registry, trace_store)
 
     graph = build_research_app(
         settings=settings,
@@ -132,5 +162,7 @@ def build_default_app(settings: Settings | None = None) -> ResearchRuntime:
         llm_provider=llm_provider,
         registry=registry,
         memory_store=memory_store,
+        trace_store=trace_store,
     )
-    return ResearchRuntime(graph=graph, settings=settings, memory=memory_store, kb_client=kb_client)
+    return ResearchRuntime(graph=graph, settings=settings, memory=memory_store,
+                           kb_client=kb_client, trace=trace_store)
