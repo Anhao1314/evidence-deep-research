@@ -20,8 +20,9 @@ class ResearchState(TypedDict, total=False):
     user_id: str
     run_id: str
 
-    # 上下文（M2 起由记忆系统填充）
+    # 上下文（记忆召回产物）
     preferences: dict
+    related_history: list[dict]
 
     # 计划与护栏
     plan: Plan
