@@ -1,0 +1,25 @@
+services:
+  deep-research:
+    build: .
+    image: deep-research:latest
+    ports:
+      - "8000:8000"
+    environment:
+      # 离线模式默认可跑；接入真实模型/搜索时改 online 并补 Key
+      - DR_MODE=offline
+      - DR_MCP_KB_ENABLED=true
+      - DR_SEARCH_PROVIDER=demo
+      # - DR_LLM_BASE_URL=https://api.deepseek.com/v1
+      # - DR_LLM_API_KEY=sk-xxx
+      # - DR_LLM_MODEL=deepseek-chat
+      # - DR_SEARCH_PROVIDER=tavily
+      # - DR_TAVILY_API_KEY=tvly-xxx
+    volumes:
+      # 语料与 SQLite（记忆/trace/reports）持久化到宿主机
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/api/health').raise_for_status()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s

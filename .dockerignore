@@ -1,0 +1,14 @@
+.venv/
+.git/
+.github/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+data/*.sqlite3
+docs/
+eval-report.json
+.env
+Dockerfile
+docker-compose.yml
