@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
     runtime = build_default_app(settings)
     app.state.settings = settings
     app.state.runtime = runtime
-    app.state.reports = {}  # M3 换 SQLite 持久化
+    app.state.reports = {}  # 进程内缓存；持久层走 runtime.trace（runs 库）
     try:
         yield
     finally:
@@ -70,15 +70,30 @@ def create_research(req: ResearchRequest) -> dict:
     if report is None:
         raise HTTPException(status_code=500, detail="研究流程未产出报告")
     app.state.reports[report.report_id] = report
+    runtime.trace.save_report(report)
     return report.model_dump()
 
 
 @app.get("/api/reports/{report_id}")
 def get_report(report_id: str) -> dict:
-    report = app.state.reports.get(report_id)
+    report = app.state.reports.get(report_id) or app.state.runtime.trace.get_report(report_id)
     if report is None:
         raise HTTPException(status_code=404, detail="报告不存在")
     return report.model_dump()
+
+
+@app.get("/api/traces/{trace_id}")
+def get_trace(trace_id: str) -> dict:
+    events = app.state.runtime.trace.get(trace_id)
+    if not events:
+        raise HTTPException(status_code=404, detail="trace 不存在")
+    total_tokens = sum(e.token_usage for e in events)
+    return {
+        "trace_id": trace_id,
+        "event_count": len(events),
+        "token_usage": total_tokens,
+        "events": [e.model_dump() for e in events],
+    }
 
 
 @app.get("/api/memory/{user_id}")
