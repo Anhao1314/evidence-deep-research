@@ -27,3 +27,4 @@ outputs/
 .idea/
 .vscode/
 eval-report.json
+.eval-smoke.json
