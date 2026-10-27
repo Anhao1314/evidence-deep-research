@@ -1,0 +1,35 @@
+[project]
+name = "deep-research"
+version = "0.1.0"
+description = "垂直领域 Deep Research 多智能体研究系统：LangGraph 编排 + 双子 Agent 并行检索 + 自研 MCP 知识库 + 离线可跑"
+requires-python = ">=3.11"
+dependencies = [
+    "langgraph>=1.0,<2.0",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "pytest-timeout>=2.4",
+    "ruff>=0.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app", "knowledge_base"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 120
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
