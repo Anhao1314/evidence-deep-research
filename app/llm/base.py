@@ -19,6 +19,8 @@ class PlanContext:
     related_history: list[dict] = field(default_factory=list)
     # replan 时聚焦的缺口：[{"topic","object","missing_aspects":[...]}]
     replan_focus: list[dict] = field(default_factory=list)
+    # 当前 run 的 trace_id，供 Provider 层落 usage/degrade 事件
+    trace_id: str | None = None
 
 
 @dataclass
@@ -27,6 +29,7 @@ class ComposeContext:
     evidences: list  # list[Evidence]
     information_gaps: list[str] = field(default_factory=list)
     preferences: dict[str, str] = field(default_factory=dict)
+    trace_id: str | None = None
 
 
 @dataclass

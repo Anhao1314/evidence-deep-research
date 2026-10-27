@@ -1,21 +1,21 @@
 """在线 Provider：OpenAI 兼容协议（DeepSeek / 通义 / OpenAI 可切换）。
 
-M1 提供基础实现；在线链路的重试/降级/引用校验在 M3 与 Trace 一起完善。
-离线测试不触网，本模块在 CI 中仅做导入与提示词构造的单元校验。
+带指数退避重试与 token usage 落 trace；引用合法性由 ResilientProvider
+统一 guard（本类提供 rewrite 受限重写能力）。离线测试不触网，
+本模块在 CI 中仅做提示词构造与解析逻辑的单元校验。
 """
 
 import json
-import re
+import time
 import uuid
 
 import httpx
 
 from app.domain_registry import DomainRegistry
 from app.llm.base import ComposeContext, ComposeResult, PlanContext
+from app.report.citation_guard import extract_citations, rewrite_prompt
 from app.report.synth import collect_sources
-from app.schema.evidence import Evidence
 from app.schema.plan import Plan, SubTask
-from app.schema.report import Citation
 
 
 class PlanError(RuntimeError):
@@ -23,13 +23,26 @@ class PlanError(RuntimeError):
 
 
 class OpenAICompatProvider:
-    def __init__(self, *, base_url: str, api_key: str, model: str, registry: DomainRegistry,
-                 timeout: float = 60.0) -> None:
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        api_key: str,
+        model: str,
+        registry: DomainRegistry,
+        timeout: float = 60.0,
+        max_retries: int = 2,
+        retry_base_delay: float = 0.5,
+        trace_store=None,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
         self.registry = registry
         self.timeout = timeout
+        self.max_retries = max_retries
+        self.retry_base_delay = retry_base_delay
+        self._trace_store = trace_store
 
     # ---------- plan ----------
 
@@ -43,6 +56,8 @@ class OpenAICompatProvider:
                 "replan 时只针对给定缺口生成补充子任务。"
             ),
             user=self._plan_user_prompt(ctx),
+            trace_id=ctx.trace_id,
+            stage="plan",
         )
         return self._parse_plan(payload)
 
@@ -94,52 +109,76 @@ class OpenAICompatProvider:
                 "禁止使用清单之外的编号；证据不足的结论必须明说。"
             ),
             user=f"研究问题：{ctx.question}\n\n证据清单：\n" + "\n".join(evidence_lines),
+            trace_id=ctx.trace_id,
+            stage="compose",
         )
         return ComposeResult(
             markdown=md,
             summary=self._first_paragraph(md),
-            citations=self._extract_citations(md, ctx.evidences),
+            citations=extract_citations(md, ctx.evidences),
             sources=collect_sources(list(ctx.evidences)),
+        )
+
+    def rewrite(self, markdown: str, invalid_ids: list[str]) -> str:
+        """受限重写：只允许修正非法引用，用于引用 guard 的第一次修复尝试。"""
+        return self._chat(
+            system="你是文本修正器。严格遵守用户指令，只做被允许的修改。",
+            user=rewrite_prompt(markdown, invalid_ids),
+            response_json=False,
         )
 
     @staticmethod
     def _first_paragraph(markdown: str) -> str:
-        """取标题之后的第一个非空段落作为摘要（M3 引用 guard 时进一步结构化）。"""
+        """取标题之后的第一个非空段落作为摘要。"""
         lines = [ln.strip() for ln in markdown.splitlines() if ln.strip()]
         for line in lines:
             if not line.startswith("#"):
                 return line[:300]
         return ""
 
-    def _extract_citations(self, markdown: str, evidences: list[Evidence]) -> list[Citation]:
-        """从生成的 markdown 抽取 [E#] 引用；非法编号在 M3 的 guard 中处理。"""
-        valid = {e.evidence_id for e in evidences}
-        citations: list[Citation] = []
-        for i, line in enumerate(markdown.splitlines()):
-            ids = [m for m in re.findall(r"\[(E\d+)\]", line) if m in valid]
-            if ids:
-                citations.append(Citation(location=f"line#{i + 1}", evidence_ids=sorted(set(ids))))
-        return citations
-
     # ---------- HTTP ----------
 
-    def _chat(self, *, system: str, user: str) -> str:
-        resp = httpx.post(
-            f"{self.base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {self.api_key}"},
-            json={
-                "model": self.model,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.2,
-            },
-            timeout=self.timeout,
-        )
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
+    def _chat(self, *, system: str, user: str, trace_id: str | None = None,
+              stage: str = "chat", response_json: bool = True) -> str:
+        body: dict = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "temperature": 0.2,
+        }
+        if response_json:
+            body["response_format"] = {"type": "json_object"}
+
+        last_error: Exception | None = None
+        for attempt in range(self.max_retries + 1):
+            try:
+                resp = httpx.post(
+                    f"{self.base_url}/chat/completions",
+                    headers={"Authorization": f"Bearer {self.api_key}"},
+                    json=body,
+                    timeout=self.timeout,
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    self._record_usage(trace_id, stage, int(data.get("usage", {}).get("total_tokens", 0)))
+                    return data["choices"][0]["message"]["content"]
+                last_error = RuntimeError(f"LLM HTTP {resp.status_code}: {resp.text[:120]}")
+                if resp.status_code < 500 and resp.status_code != 429:
+                    break
+            except httpx.HTTPError as exc:
+                last_error = exc
+            if attempt < self.max_retries:
+                time.sleep(self.retry_base_delay * (2**attempt))
+        raise last_error or RuntimeError("LLM 调用失败")
+
+    def _record_usage(self, trace_id: str | None, stage: str, tokens: int) -> None:
+        if self._trace_store is not None and trace_id and tokens > 0:
+            self._trace_store.record(
+                trace_id, node="llm", event_type="usage",
+                payload={"stage": stage, "model": self.model}, token_usage=tokens,
+            )
 
     @staticmethod
     def _extract_json(raw: str) -> str:
