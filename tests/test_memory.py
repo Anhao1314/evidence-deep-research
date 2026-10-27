@@ -1,7 +1,6 @@
 """跨会话记忆：三表 schema、召回、沉淀、跨会话生命周期。"""
 
 from app.memory.store import MemoryStore
-from knowledge_base.retriever import KBRetriever
 
 
 def _make_report(question: str, evidences):
@@ -34,7 +33,6 @@ def test_recall_empty_store(tmp_path):
 
 
 def test_record_and_recall_roundtrip(tmp_path, settings):
-    retriever = KBRetriever.from_dir(settings.kb_corpus_dir)
     from app.schema.evidence import Evidence, Source
 
     evidences = [

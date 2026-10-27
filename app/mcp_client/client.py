@@ -13,6 +13,7 @@
 
 import asyncio
 import json
+import logging
 import os
 import sys
 import threading
@@ -23,6 +24,8 @@ from typing import Any
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
+
+logger = logging.getLogger(__name__)
 
 from knowledge_base.corpus import KBDocument
 from knowledge_base.retriever import ScoredDoc
@@ -98,8 +101,8 @@ class McpKBClient:
         if self._serve_future is not None:
             try:
                 self._serve_future.result(timeout=5)
-            except Exception:  # noqa: BLE001 —— 关闭路径尽力而为
-                pass
+            except Exception as exc:  # noqa: BLE001 —— 关闭路径尽力而为，不向调用方抛错
+                logger.debug("MCP 会话关闭时出现残留异常（忽略）: %s", exc)
         self._loop.call_soon_threadsafe(self._loop.stop)
         self._thread.join(timeout=5)
 

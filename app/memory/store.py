@@ -12,13 +12,13 @@
 
 import json
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from knowledge_base.bm25 import BM25Index
 from pydantic import BaseModel, Field
 
 from app.schema.report import Report
+from knowledge_base.bm25 import BM25Index
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS user_preferences (
@@ -48,7 +48,7 @@ CREATE INDEX IF NOT EXISTS idx_snippets_topic ON knowledge_snippets(topic_id);
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 class RelatedTopic(BaseModel):

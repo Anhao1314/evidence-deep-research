@@ -9,8 +9,9 @@ import json
 from pathlib import Path
 from typing import Protocol
 
+from pydantic import BaseModel
+
 from knowledge_base.bm25 import BM25Index
-from pydantic import BaseModel, Field
 
 
 class WebHit(BaseModel):

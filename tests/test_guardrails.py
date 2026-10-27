@@ -1,6 +1,5 @@
 """护栏：防死循环（轮数/步数上限、重复计划检测、全链路收敛）。"""
 
-from app.config import Settings
 from app.domain_registry import DomainRegistry
 from app.graph.factory import build_research_app
 from app.guardrails import Guardrails, is_duplicate_plan

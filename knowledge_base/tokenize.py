@@ -4,6 +4,7 @@
 bigram 在无分词器依赖的前提下保留了大部分区分度。
 """
 
+import itertools
 import re
 
 _WORD_RE = re.compile(r"[a-zA-Z0-9]+")
@@ -35,4 +36,4 @@ def tokenize(text: str) -> list[str]:
 
 def _emit_cjk(tokens: list[str], buf: list[str]) -> None:
     tokens.extend(buf)
-    tokens.extend(f"{a}{b}" for a, b in zip(buf, buf[1:]))
+    tokens.extend(f"{a}{b}" for a, b in itertools.pairwise(buf))

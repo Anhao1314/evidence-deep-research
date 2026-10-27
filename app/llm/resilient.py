@@ -9,13 +9,12 @@
 用 fake primary 测试，失败恢复行为在离线测试里可完整验证。
 """
 
+from app.llm.base import ComposeContext, ComposeResult, PlanContext
 from app.report.citation_guard import (
     check_citations,
     extract_citations,
-    rewrite_prompt,
     strip_invalid_citations,
 )
-from app.llm.base import ComposeContext, ComposeResult, PlanContext
 from app.schema.plan import Plan
 from app.trace.store import TraceStore
 

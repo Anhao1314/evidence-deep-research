@@ -4,14 +4,14 @@
 Evidence 必须携带完整的 Source 定位信息（URL 或 知识库文档+段落）。
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 class Source(BaseModel):

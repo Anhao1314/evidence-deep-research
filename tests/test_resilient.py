@@ -115,7 +115,6 @@ def test_citation_stripped_when_rewrite_fails(tmp_path):
     provider = ResilientProvider(_StubbornBadProvider(), fallback=None, trace_store=trace)
     result = provider.compose(_ctx([_ev(1)]))
     assert "[E99]" not in result.markdown, "重写失败必须剥离非法引用"
-    assert "[E1]" not in result.markdown or True  # E1 不在该句中
     errors = [e for e in trace.get("run-guard") if e.event_type == "error"]
     assert errors and errors[0].payload["action"] == "stripped"
     trace.close()

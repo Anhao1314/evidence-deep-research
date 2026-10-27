@@ -12,7 +12,7 @@ verify / memory_recall / synthesize / persist / usage / error。
 import json
 import sqlite3
 import threading
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -45,7 +45,7 @@ EVENT_TYPES = (
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+    return datetime.now(UTC).isoformat(timespec="milliseconds")
 
 
 class TraceEvent(BaseModel):
@@ -106,14 +106,14 @@ class TraceStore:
     # ---------- 报告持久化（运行产物库：events + reports 同库） ----------
 
     def save_report(self, report) -> None:
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         with self._lock:
             self._conn.execute(
                 "INSERT INTO reports(report_id, question, created_at, body) VALUES(?,?,?,?) "
                 "ON CONFLICT(report_id) DO UPDATE SET body=excluded.body",
                 (report.report_id, report.question,
-                 datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                 datetime.now(UTC).isoformat(timespec="seconds"),
                  report.model_dump_json()),
             )
             self._conn.commit()

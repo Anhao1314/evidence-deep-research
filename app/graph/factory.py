@@ -10,7 +10,6 @@ MCP 化前后图结构不变：把 InProcessKBClient 换成 McpKBClient 即切�
 """
 
 from dataclasses import dataclass
-from typing import Callable
 
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
