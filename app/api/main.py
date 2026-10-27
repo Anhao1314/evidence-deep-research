@@ -42,8 +42,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Deep Research API",
-    description="垂直领域（技术选型调研）多智能体研究系统",
+    title="Evidence Deep Research API",
+    description="可溯源的多路并行技术选型研究系统",
     version="0.2.0",
     lifespan=lifespan,
 )

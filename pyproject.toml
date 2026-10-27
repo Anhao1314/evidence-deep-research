@@ -1,7 +1,8 @@
 [project]
 name = "deep-research"
-version = "0.1.0"
-description = "垂直领域 Deep Research 多智能体研究系统：LangGraph 编排 + 双子 Agent 并行检索 + 自研 MCP 知识库 + 离线可跑"
+version = "0.2.0"
+description = "Evidence Deep Research：可溯源的多路并行技术选型研究系统（LangGraph + MCP + RAG）"
+readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "langgraph>=1.0,<2.0",
