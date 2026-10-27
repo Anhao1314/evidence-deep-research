@@ -34,6 +34,16 @@ class Settings(BaseSettings):
     mcp_connect_timeout: float = 30.0
     mcp_call_timeout: float = 30.0
 
+    # Web 搜索路：demo = 内置演示数据；tavily = 在线搜索（需 API Key）
+    search_provider: str = "demo"
+    tavily_api_key: str | None = None
+    tavily_timeout: float = 15.0
+
+    # Trace 与 LLM 弹性
+    trace_db_path: Path = PROJECT_ROOT / "data" / "trace.sqlite3"
+    llm_max_retries: int = 2
+    llm_retry_base_delay: float = 0.5
+
     @property
     def offline(self) -> bool:
         return self.mode == "offline"
