@@ -5,6 +5,7 @@ from app.domain_registry import DomainRegistry
 from app.graph.factory import build_research_app
 from app.guardrails import Guardrails, is_duplicate_plan
 from app.llm.heuristic import HeuristicProvider
+from app.memory.store import MemoryStore
 from app.schema.plan import Plan, SubTask
 from app.tools.kb_client import KBClient
 from app.tools.search import SearchProvider
@@ -45,7 +46,7 @@ def test_duplicate_plan_detected():
     assert is_duplicate_plan(p2, [p1.signature()])
 
 
-def test_persistent_gap_converges_within_plan_rounds(settings):
+def test_persistent_gap_converges_within_plan_rounds(settings, tmp_path):
     """检索恒空 -> 每轮 verify 都有缺口 -> 必须在 max_plan_rounds 内收敛出报告。"""
     settings = settings.model_copy(update={"max_plan_rounds": 2, "max_steps": 24})
     retriever = KBRetriever.from_dir(settings.kb_corpus_dir)
@@ -57,6 +58,7 @@ def test_persistent_gap_converges_within_plan_rounds(settings):
         search_provider=_EmptySearchProvider(),
         llm_provider=provider,
         registry=registry,
+        memory_store=MemoryStore(tmp_path / "guard1.sqlite3"),
     )
     final = app.invoke(
         {"question": "RAG 向量库选 Qdrant 还是 Milvus？", "user_id": "t", "run_id": "run-loop"},
@@ -69,7 +71,7 @@ def test_persistent_gap_converges_within_plan_rounds(settings):
     assert final["evidences"] == []
 
 
-def test_low_step_budget_forces_convergence(settings):
+def test_low_step_budget_forces_convergence(settings, tmp_path):
     """步数预算极小 -> 第一轮 verify 后步数耗尽，不得进入第二轮 plan。"""
     settings = settings.model_copy(update={"max_steps": 4, "max_plan_rounds": 4})
     retriever = KBRetriever.from_dir(settings.kb_corpus_dir)
@@ -81,6 +83,7 @@ def test_low_step_budget_forces_convergence(settings):
         search_provider=_EmptySearchProvider(),
         llm_provider=provider,
         registry=registry,
+        memory_store=MemoryStore(tmp_path / "guard2.sqlite3"),
     )
     final = app.invoke(
         {"question": "Qdrant 和 Milvus 哪个好？", "user_id": "t", "run_id": "run-budget"},
