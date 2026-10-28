@@ -1,0 +1,268 @@
+{
+  "trace_id": "demo-insufficient",
+  "event_count": 11,
+  "token_usage": 0,
+  "events": [
+    {
+      "seq": 1,
+      "ts": "2026-10-28T19:28:38.330+00:00",
+      "node": "load_context",
+      "event_type": "memory_recall",
+      "payload": {
+        "preferences": {},
+        "related_topics": 0,
+        "snippets": 0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 2,
+      "ts": "2026-10-28T19:28:38.330+00:00",
+      "node": "plan",
+      "event_type": "plan",
+      "payload": {
+        "plan_id": "plan-1c388694",
+        "subtasks": [
+          {
+            "subtask_id": "T320a75",
+            "route": "kb",
+            "topic": "",
+            "object_name": "",
+            "object_display": "",
+            "aspect": "general",
+            "query": "怎么评估一个开源项目的社区健康度？"
+          },
+          {
+            "subtask_id": "T4d54d0",
+            "route": "web",
+            "topic": "",
+            "object_name": "",
+            "object_display": "",
+            "aspect": "general",
+            "query": "怎么评估一个开源项目的社区健康度？"
+          }
+        ],
+        "rationale": "启发式规则：领域外问题，泛化检索降级",
+        "is_duplicate": false,
+        "round": 1,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 3,
+      "ts": "2026-10-28T19:28:38.330+00:00",
+      "node": "dispatch",
+      "event_type": "dispatch",
+      "payload": {
+        "fan_out": 2,
+        "targets": [
+          "rag_agent",
+          "web_agent"
+        ],
+        "subtask_ids": [
+          "T320a75",
+          "T4d54d0"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 4,
+      "ts": "2026-10-28T19:28:38.331+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "T320a75",
+        "query": "怎么评估一个开源项目的社区健康度？",
+        "top_k": 8,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 5,
+      "ts": "2026-10-28T19:28:38.332+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "T4d54d0",
+        "query": "怎么评估一个开源项目的社区健康度？",
+        "top_k": 4,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 6,
+      "ts": "2026-10-28T19:28:38.333+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "hits": 8,
+        "latency_ms": 0.06
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 7,
+      "ts": "2026-10-28T19:28:38.333+00:00",
+      "node": "web_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "hits": 4,
+        "latency_ms": 0.03
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 8,
+      "ts": "2026-10-28T19:28:38.334+00:00",
+      "node": "merge",
+      "event_type": "merge",
+      "payload": {
+        "raw_evidences": 12,
+        "after_scope": 0,
+        "deduped": 0,
+        "after_budget_and_prefs": 0,
+        "excluded_by_reason": {
+          "unscoped_question": 12
+        },
+        "excluded": [
+          {
+            "source_ref": "doc:kb-milvus-maturity §4 成熟度 (kb)",
+            "claim": "Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "doc:kb-langgraph-eco §2 生态 (kb)",
+            "claim": "LangGraph 与 LangChain 生态共享工具适配层（150+ 工具集成），LangSmith 提供商用级 trace 与评测闭环。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "doc:kb-custom-maturity §4 成熟度 (kb)",
+            "claim": "自研框架的成熟度等于团队自身工程水位，无外部社区兜底。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "doc:kb-milvus-eco §2 生态 (kb)",
+            "claim": "Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "doc:kb-custom-eco §2 生态 (kb)",
+            "claim": "自研框架无现成工具适配层，每接入一个外部系统（搜索、数据库、MCP）都要写适配代码。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "doc:kb-qwen-eco §3 生态 (kb)",
+            "claim": "Qwen 通过 DashScope 与百炼平台提供 OpenAI 兼容端点（compatible-mode/v1），LangChain/LangGraph 有官方集成文档。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "doc:kb-qdrant-eco §2 生态 (kb)",
+            "claim": "Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "doc:kb-qwen-maturity §4 成熟度 (kb)",
+            "claim": "Qwen 由阿里云提供企业级 SLA，服务稳定性记录良好，通过等保等国内合规认证，政企客户案例多。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "https://news.ycombinator.com/item?id=custom-agent-postmortem 2025-02-10 (web)",
+            "claim": "团队一年后迁移到开源框架：自研的断点恢复与重试是最大的坑。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)",
+            "claim": "社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "https://www.aliyun.com/legal/sla 2025-04-01 (web)",
+            "claim": "企业级 SLA 与国内合规认证齐全。",
+            "reason": "unscoped_question"
+          },
+          {
+            "source_ref": "https://langchain-ai.github.io/langgraph/concepts/multi_agent/ 2025-08-01 (web)",
+            "claim": "Send API 支持 map-reduce 式动态并行派发子任务。",
+            "reason": "unscoped_question"
+          }
+        ],
+        "coverage": {}
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 9,
+      "ts": "2026-10-28T19:28:38.334+00:00",
+      "node": "verify",
+      "event_type": "verify",
+      "payload": {
+        "gaps": [
+          "问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。"
+        ],
+        "replan": false,
+        "constraint_summary": {
+          "verdict": "not_checked",
+          "recommended_objects": [],
+          "excluded": {},
+          "unknown_objects": [],
+          "findings": [],
+          "gaps": [],
+          "checked_objects": []
+        }
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 10,
+      "ts": "2026-10-28T19:28:38.335+00:00",
+      "node": "synthesize",
+      "event_type": "synthesize",
+      "payload": {
+        "markdown_chars": 143,
+        "citations": 0,
+        "evidences": 0,
+        "sources": 0,
+        "degraded": false,
+        "guard_ran": false,
+        "guard_quarantined": 0,
+        "guard_fallback": false,
+        "constraint_verdict": "not_checked"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 11,
+      "ts": "2026-10-28T19:28:38.335+00:00",
+      "node": "persist",
+      "event_type": "persist",
+      "payload": {
+        "topic_recorded": true,
+        "snippets": 0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    }
+  ]
+}

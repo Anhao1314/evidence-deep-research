@@ -29,9 +29,18 @@ jobs:
       - name: Eval suite
         run: python -m eval.run_eval --output eval-report.json
 
-      - name: Upload eval report
+      - name: Offline research task suite (structural, no API key)
+        run: python -m eval.run_offline_suite --output offline-suite-report.json
+
+      - name: Constraint fixture suite (offline, synthetic)
+        run: python -m eval.run_constraint_fixture --output constraint-fixture-report.json
+
+      - name: Upload eval reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: eval-report
-          path: eval-report.json
+          name: eval-reports
+          path: |
+            eval-report.json
+            offline-suite-report.json
+            constraint-fixture-report.json

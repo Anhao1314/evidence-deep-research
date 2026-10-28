@@ -1,0 +1,1514 @@
+{
+  "report_id": "demo-constraints",
+  "question": "我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？",
+  "trace_id": "demo-constraints",
+  "markdown": "# 技术选型研究报告\n\n> 研究问题：我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n**Helios**：性能：Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5]；生态：Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6]；成本：Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7]；成熟度：Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8]。\n\n**pgvector**：性能：pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11]；生态：pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12]；成本：pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13]；成熟度：pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14]。\n\n**Nebula**：性能：Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9]；成熟度：Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10]。\n\n## 约束核对\n\n- [C1] 500 万条 768 维向量：Atlas 满足（支持上限 10,000,000 / 要求 5,000,000）；Helios 满足（支持上限 100,000,000 / 要求 5,000,000）；pgvector 满足（支持上限 10,000,000 / 要求 5,000,000）\n- [C2] 5 人：Atlas 满足（最低团队 2 人 / 可用 5 人）；Helios 违反（最低团队 10 人 / 可用 5 人）；pgvector 满足（最低团队 2 人 / 可用 5 人）\n- [C3] 低成本/预算有限：Atlas 满足（成本等级 0 / 上限 0）；Helios 违反（成本等级 2 / 上限 0）；pgvector 满足（成本等级 0 / 上限 0）\n- [C4] 自托管：Atlas 满足（支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted）；Helios 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）；pgvector 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）\n- [C5] 不引入新数据库/中间件：Atlas 违反（需要新基础设施=True）；Helios 违反（需要新基础设施=True）；pgvector 满足（需要新基础设施=False）\n\n**约束结论**：在给定约束下，唯一满足全部可核验约束的是 pgvector；Atlas 违反 C5；Helios 违反 C2, C3, C5。\n\n## 分维度对比\n\n| 维度 | Atlas | Helios | pgvector | Nebula |\n|---|---|---|---|---|\n| 性能 | Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1] | Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5] | pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11] | Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9] |\n| 生态 | Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2] | Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6] | pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12] | —（本轮无证据） |\n| 成本 | Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3] | Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7] | pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13] | —（本轮无证据） |\n| 成熟度 | Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4] | Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8] | pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14] | Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10] |\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n- **[E5]** Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；（来源 [S5]：doc:fixture-helios-perf §1 容量 (kb)）\n- **[E6]** Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；（来源 [S6]：doc:fixture-helios-eco §2 生态 (kb)）\n- **[E7]** Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；（来源 [S7]：doc:fixture-helios-cost §3 成本 (kb)）\n- **[E8]** Helios 在大型企业有亿级向量案例，版本节奏稳定；（来源 [S8]：doc:fixture-helios-maturity §4 成熟度 (kb)）\n- **[E9]** Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。（来源 [S9]：doc:fixture-nebula-perf §1 容量 (kb)）\n- **[E10]** Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。（来源 [S10]：doc:fixture-nebula-maturity §4 成熟度 (kb)）\n- **[E11]** pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；（来源 [S11]：doc:fixture-pgvector-perf §1 容量 (kb)）\n- **[E12]** pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。（来源 [S12]：doc:fixture-pgvector-eco §2 生态 (kb)）\n- **[E13]** pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；（来源 [S13]：doc:fixture-pgvector-cost §3 成本 (kb)）\n- **[E14]** pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；（来源 [S14]：doc:fixture-pgvector-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n- **[S5]** Helios 性能与容量（离线 fixture） — doc:fixture-helios-perf §1 容量 (kb)\n- **[S6]** Helios 生态（离线 fixture） — doc:fixture-helios-eco §2 生态 (kb)\n- **[S7]** Helios 成本（离线 fixture） — doc:fixture-helios-cost §3 成本 (kb)\n- **[S8]** Helios 成熟度（离线 fixture） — doc:fixture-helios-maturity §4 成熟度 (kb)\n- **[S9]** Nebula 性能（离线 fixture，缺少结构化属性） — doc:fixture-nebula-perf §1 容量 (kb)\n- **[S10]** Nebula 成熟度（离线 fixture，缺少结构化属性） — doc:fixture-nebula-maturity §4 成熟度 (kb)\n- **[S11]** pgvector 性能与容量（离线 fixture） — doc:fixture-pgvector-perf §1 容量 (kb)\n- **[S12]** pgvector 生态（离线 fixture） — doc:fixture-pgvector-eco §2 生态 (kb)\n- **[S13]** pgvector 成本（离线 fixture） — doc:fixture-pgvector-cost §3 成本 (kb)\n- **[S14]** pgvector 成熟度（离线 fixture） — doc:fixture-pgvector-maturity §4 成熟度 (kb)\n",
+  "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n**Helios**：性能：Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5]；生态：Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6]；成本：Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7]；成熟度：Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8]。\n\n**pgvector**：性能：pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11]；生态：pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12]；成本：pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13]；成熟度：pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14]。\n\n**Nebula**：性能：Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9]；成熟度：Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10]。\n\n## 约束核对\n\n- [C1] 500 万条 768 维向量：Atlas 满足（支持上限 10,000,000 / 要求 5,000,000）；Helios 满足（支持上限 100,000,000 / 要求 5,000,000）；pgvector 满足（支持上限 10,000,000 / 要求 5,000,000）\n- [C2] 5 人：Atlas 满足（最低团队 2 人 / 可用 5 人）；Helios 违反（最低团队 10 人 / 可用 5 人）；pgvector 满足（最低团队 2 人 / 可用 5 人）\n- [C3] 低成本/预算有限：Atlas 满足（成本等级 0 / 上限 0）；Helios 违反（成本等级 2 / 上限 0）；pgvector 满足（成本等级 0 / 上限 0）\n- [C4] 自托管：Atlas 满足（支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted）；Helios 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）；pgvector 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）\n- [C5] 不引入新数据库/中间件：Atlas 违反（需要新基础设施=True）；Helios 违反（需要新基础设施=True）；pgvector 满足（需要新基础设施=False）\n\n**约束结论**：在给定约束下，唯一满足全部可核验约束的是 pgvector；Atlas 违反 C5；Helios 违反 C2, C3, C5。\n\n## 分维度对比\n\n| 维度 | Atlas | Helios | pgvector | Nebula |\n|---|---|---|---|---|\n| 性能 | Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1] | Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5] | pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11] | Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9] |\n| 生态 | Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2] | Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6] | pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12] | —（本轮无证据） |\n| 成本 | Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3] | Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7] | pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13] | —（本轮无证据） |\n| 成熟度 | Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4] | Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8] | pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14] | Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10] |\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n- **[E5]** Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；（来源 [S5]：doc:fixture-helios-perf §1 容量 (kb)）\n- **[E6]** Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；（来源 [S6]：doc:fixture-helios-eco §2 生态 (kb)）\n- **[E7]** Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；（来源 [S7]：doc:fixture-helios-cost §3 成本 (kb)）\n- **[E8]** Helios 在大型企业有亿级向量案例，版本节奏稳定；（来源 [S8]：doc:fixture-helios-maturity §4 成熟度 (kb)）\n- **[E9]** Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。（来源 [S9]：doc:fixture-nebula-perf §1 容量 (kb)）\n- **[E10]** Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。（来源 [S10]：doc:fixture-nebula-maturity §4 成熟度 (kb)）\n- **[E11]** pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；（来源 [S11]：doc:fixture-pgvector-perf §1 容量 (kb)）\n- **[E12]** pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。（来源 [S12]：doc:fixture-pgvector-eco §2 生态 (kb)）\n- **[E13]** pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；（来源 [S13]：doc:fixture-pgvector-cost §3 成本 (kb)）\n- **[E14]** pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；（来源 [S14]：doc:fixture-pgvector-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n- **[S5]** Helios 性能与容量（离线 fixture） — doc:fixture-helios-perf §1 容量 (kb)\n- **[S6]** Helios 生态（离线 fixture） — doc:fixture-helios-eco §2 生态 (kb)\n- **[S7]** Helios 成本（离线 fixture） — doc:fixture-helios-cost §3 成本 (kb)\n- **[S8]** Helios 成熟度（离线 fixture） — doc:fixture-helios-maturity §4 成熟度 (kb)\n- **[S9]** Nebula 性能（离线 fixture，缺少结构化属性） — doc:fixture-nebula-perf §1 容量 (kb)\n- **[S10]** Nebula 成熟度（离线 fixture，缺少结构化属性） — doc:fixture-nebula-maturity §4 成熟度 (kb)\n- **[S11]** pgvector 性能与容量（离线 fixture） — doc:fixture-pgvector-perf §1 容量 (kb)\n- **[S12]** pgvector 生态（离线 fixture） — doc:fixture-pgvector-eco §2 生态 (kb)\n- **[S13]** pgvector 成本（离线 fixture） — doc:fixture-pgvector-cost §3 成本 (kb)\n- **[S14]** pgvector 成熟度（离线 fixture） — doc:fixture-pgvector-maturity §4 成熟度 (kb)\n",
+  "summary": "Atlas：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量。；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器。；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维。；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主。。 Helios：性能：Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量。；生态：Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发。；成本：Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本。；成熟度：Helios 在大型企业有亿级向量案例，版本节奏稳定。。 pgvector：性能：pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW。；生态：pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。；成本：pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源。；成熟度：pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新。。 Nebula：性能：Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。；成熟度：Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。。 在给定约束下，唯一满足全部可核验约束的是 pgvector；Atlas 违反 C5；Helios 违反 C2, C3, C5。",
+  "sources": [
+    {
+      "source_id": "S1",
+      "kind": "kb",
+      "title": "Atlas 性能与容量（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-atlas-perf",
+      "locator": "§1 容量",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "b502e2ad4cd67df0f2cec18ed36c19fc8667fecfaebe45d4d355fb8e5ce9841b",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S2",
+      "kind": "kb",
+      "title": "Atlas 生态（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-atlas-eco",
+      "locator": "§2 生态",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "43b5742069984867b59821e21ac503d067e70b50bb022d8fe0598d14a2a173f4",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S3",
+      "kind": "kb",
+      "title": "Atlas 成本（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-atlas-cost",
+      "locator": "§3 成本",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "0162f38b8b97cff7a8221062d1357181bf08f002828aed2cb2daf0bd8f7067b5",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S4",
+      "kind": "kb",
+      "title": "Atlas 成熟度（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-atlas-maturity",
+      "locator": "§4 成熟度",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "c56021e686863dc098e4d47a1bb1011f1b554c5eaaa771e98b34238c181716be",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S5",
+      "kind": "kb",
+      "title": "Helios 性能与容量（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-helios-perf",
+      "locator": "§1 容量",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "124a7cdacad0143d884949462d713940f9d7d8bb24164b97988c42f0fb76114a",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S6",
+      "kind": "kb",
+      "title": "Helios 生态（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-helios-eco",
+      "locator": "§2 生态",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "7d01bc926a5451bc0edfc1cdc5b41f0ee7ff1e8d31a7cc4c585e311600ac852e",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S7",
+      "kind": "kb",
+      "title": "Helios 成本（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-helios-cost",
+      "locator": "§3 成本",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "1eab0f42c4620d004157c40b7dcafe552dfbb87bb5259eebeccb87d2d2718682",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S8",
+      "kind": "kb",
+      "title": "Helios 成熟度（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-helios-maturity",
+      "locator": "§4 成熟度",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "a13c1a137bea75781a741b930bf8ba6b34d7e221bf42bfdbe8f60b7df8700654",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S9",
+      "kind": "kb",
+      "title": "Nebula 性能（离线 fixture，缺少结构化属性）",
+      "url": null,
+      "doc_id": "fixture-nebula-perf",
+      "locator": "§1 容量",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "b501c3142f034ddf719effc3b04bdb57aed493b03a41703e84a474303d4ad61e",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S10",
+      "kind": "kb",
+      "title": "Nebula 成熟度（离线 fixture，缺少结构化属性）",
+      "url": null,
+      "doc_id": "fixture-nebula-maturity",
+      "locator": "§4 成熟度",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "782235de026466092d823f00a8a3611ad09d9c7697280a321ac7cae8ebee8c89",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S11",
+      "kind": "kb",
+      "title": "pgvector 性能与容量（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-pgvector-perf",
+      "locator": "§1 容量",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "edcb672aace24c40a3e3650f8a8dc41cc3e5586d8167d3e504b9ef0f1efac3fa",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S12",
+      "kind": "kb",
+      "title": "pgvector 生态（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-pgvector-eco",
+      "locator": "§2 生态",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "e2e45695a9d2b49bd07a9191c3d9de17013b795b32f4184975ba9349dadc14ea",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S13",
+      "kind": "kb",
+      "title": "pgvector 成本（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-pgvector-cost",
+      "locator": "§3 成本",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "ead46c6fb62cbe78f558493ce65765f937b1f3a2df1a7873c3f5d8e7572eefbe",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S14",
+      "kind": "kb",
+      "title": "pgvector 成熟度（离线 fixture）",
+      "url": null,
+      "doc_id": "fixture-pgvector-maturity",
+      "locator": "§4 成熟度",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "125f0dc273e9031ba28624f0030806c340324106c87d8c8d4d14ed44650a8c6d",
+      "resolution": "kb_document",
+      "url_reachable": null
+    }
+  ],
+  "citations": [
+    {
+      "location": "summary#atlas",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    {
+      "location": "summary#helios",
+      "evidence_ids": [
+        "E5",
+        "E6",
+        "E7",
+        "E8"
+      ]
+    },
+    {
+      "location": "summary#pgvector",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E13",
+        "E14"
+      ]
+    },
+    {
+      "location": "summary#nebula",
+      "evidence_ids": [
+        "E10",
+        "E9"
+      ]
+    },
+    {
+      "location": "constraint#C1#atlas",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    {
+      "location": "constraint#C1#helios",
+      "evidence_ids": [
+        "E5",
+        "E6",
+        "E7",
+        "E8"
+      ]
+    },
+    {
+      "location": "constraint#C1#pgvector",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E13",
+        "E14"
+      ]
+    },
+    {
+      "location": "constraint#C2#atlas",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    {
+      "location": "constraint#C2#helios",
+      "evidence_ids": [
+        "E5",
+        "E6",
+        "E7",
+        "E8"
+      ]
+    },
+    {
+      "location": "constraint#C2#pgvector",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E13",
+        "E14"
+      ]
+    },
+    {
+      "location": "constraint#C3#atlas",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    {
+      "location": "constraint#C3#helios",
+      "evidence_ids": [
+        "E5",
+        "E6",
+        "E7",
+        "E8"
+      ]
+    },
+    {
+      "location": "constraint#C3#pgvector",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E13",
+        "E14"
+      ]
+    },
+    {
+      "location": "constraint#C4#atlas",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    {
+      "location": "constraint#C4#helios",
+      "evidence_ids": [
+        "E5",
+        "E6",
+        "E7",
+        "E8"
+      ]
+    },
+    {
+      "location": "constraint#C4#pgvector",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E13",
+        "E14"
+      ]
+    },
+    {
+      "location": "constraint#C5#atlas",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    {
+      "location": "constraint#C5#helios",
+      "evidence_ids": [
+        "E5",
+        "E6",
+        "E7",
+        "E8"
+      ]
+    },
+    {
+      "location": "constraint#C5#pgvector",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E13",
+        "E14"
+      ]
+    },
+    {
+      "location": "table#performance#atlas",
+      "evidence_ids": [
+        "E1"
+      ]
+    },
+    {
+      "location": "table#performance#helios",
+      "evidence_ids": [
+        "E5"
+      ]
+    },
+    {
+      "location": "table#performance#pgvector",
+      "evidence_ids": [
+        "E11"
+      ]
+    },
+    {
+      "location": "table#performance#nebula",
+      "evidence_ids": [
+        "E9"
+      ]
+    },
+    {
+      "location": "table#ecosystem#atlas",
+      "evidence_ids": [
+        "E2"
+      ]
+    },
+    {
+      "location": "table#ecosystem#helios",
+      "evidence_ids": [
+        "E6"
+      ]
+    },
+    {
+      "location": "table#ecosystem#pgvector",
+      "evidence_ids": [
+        "E12"
+      ]
+    },
+    {
+      "location": "table#cost#atlas",
+      "evidence_ids": [
+        "E3"
+      ]
+    },
+    {
+      "location": "table#cost#helios",
+      "evidence_ids": [
+        "E7"
+      ]
+    },
+    {
+      "location": "table#cost#pgvector",
+      "evidence_ids": [
+        "E13"
+      ]
+    },
+    {
+      "location": "table#maturity#atlas",
+      "evidence_ids": [
+        "E4"
+      ]
+    },
+    {
+      "location": "table#maturity#helios",
+      "evidence_ids": [
+        "E8"
+      ]
+    },
+    {
+      "location": "table#maturity#pgvector",
+      "evidence_ids": [
+        "E14"
+      ]
+    },
+    {
+      "location": "table#maturity#nebula",
+      "evidence_ids": [
+        "E10"
+      ]
+    }
+  ],
+  "evidences": [
+    {
+      "evidence_id": "E1",
+      "source": {
+        "source_id": "S1",
+        "kind": "kb",
+        "title": "Atlas 性能与容量（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-atlas-perf",
+        "locator": "§1 容量",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "b502e2ad4cd67df0f2cec18ed36c19fc8667fecfaebe45d4d355fb8e5ce9841b",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；",
+      "quote": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；超过该规模需要多分片，运维复杂度明显上升。",
+      "topic": "vector-db",
+      "object_name": "atlas",
+      "aspect": "performance",
+      "route": "kb",
+      "score": 6.7846,
+      "attributes": {
+        "max_vectors": 10000000,
+        "min_team": 2,
+        "deployment": [
+          "self-hosted",
+          "managed-cloud"
+        ],
+        "cost_tier": 0,
+        "new_infra_required": true
+      }
+    },
+    {
+      "evidence_id": "E2",
+      "source": {
+        "source_id": "S2",
+        "kind": "kb",
+        "title": "Atlas 生态（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-atlas-eco",
+        "locator": "§2 生态",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "43b5742069984867b59821e21ac503d067e70b50bb022d8fe0598d14a2a173f4",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；",
+      "quote": "Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；它是一个新的独立数据库，需要单独部署与备份。",
+      "topic": "vector-db",
+      "object_name": "atlas",
+      "aspect": "ecosystem",
+      "route": "kb",
+      "score": 8.755,
+      "attributes": {
+        "max_vectors": 10000000,
+        "min_team": 2,
+        "deployment": [
+          "self-hosted",
+          "managed-cloud"
+        ],
+        "cost_tier": 0,
+        "new_infra_required": true
+      }
+    },
+    {
+      "evidence_id": "E3",
+      "source": {
+        "source_id": "S3",
+        "kind": "kb",
+        "title": "Atlas 成本（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-atlas-cost",
+        "locator": "§3 成本",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "0162f38b8b97cff7a8221062d1357181bf08f002828aed2cb2daf0bd8f7067b5",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；",
+      "quote": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；规模上去后需要增加分片与监控成本。",
+      "topic": "vector-db",
+      "object_name": "atlas",
+      "aspect": "cost",
+      "route": "kb",
+      "score": 4.5768,
+      "attributes": {
+        "max_vectors": 10000000,
+        "min_team": 2,
+        "deployment": [
+          "self-hosted",
+          "managed-cloud"
+        ],
+        "cost_tier": 0,
+        "new_infra_required": true
+      }
+    },
+    {
+      "evidence_id": "E4",
+      "source": {
+        "source_id": "S4",
+        "kind": "kb",
+        "title": "Atlas 成熟度（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-atlas-maturity",
+        "locator": "§4 成熟度",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "c56021e686863dc098e4d47a1bb1011f1b554c5eaaa771e98b34238c181716be",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；",
+      "quote": "Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；单机架构降低了故障面，但缺少大型集群验证。",
+      "topic": "vector-db",
+      "object_name": "atlas",
+      "aspect": "maturity",
+      "route": "kb",
+      "score": 2.2127,
+      "attributes": {
+        "max_vectors": 10000000,
+        "min_team": 2,
+        "deployment": [
+          "self-hosted",
+          "managed-cloud"
+        ],
+        "cost_tier": 0,
+        "new_infra_required": true
+      }
+    },
+    {
+      "evidence_id": "E5",
+      "source": {
+        "source_id": "S5",
+        "kind": "kb",
+        "title": "Helios 性能与容量（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-helios-perf",
+        "locator": "§1 容量",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "124a7cdacad0143d884949462d713940f9d7d8bb24164b97988c42f0fb76114a",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；",
+      "quote": "Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；最小生产集群需要 etcd、对象存储和消息队列，至少 8 个节点。",
+      "topic": "vector-db",
+      "object_name": "helios",
+      "aspect": "performance",
+      "route": "kb",
+      "score": 13.662,
+      "attributes": {
+        "max_vectors": 100000000,
+        "min_team": 10,
+        "deployment": [
+          "self-hosted"
+        ],
+        "cost_tier": 2,
+        "new_infra_required": true
+      }
+    },
+    {
+      "evidence_id": "E6",
+      "source": {
+        "source_id": "S6",
+        "kind": "kb",
+        "title": "Helios 生态（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-helios-eco",
+        "locator": "§2 生态",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "7d01bc926a5451bc0edfc1cdc5b41f0ee7ff1e8d31a7cc4c585e311600ac852e",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；",
+      "quote": "Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；引入它意味着新增一套独立基础设施和运维体系。",
+      "topic": "vector-db",
+      "object_name": "helios",
+      "aspect": "ecosystem",
+      "route": "kb",
+      "score": 2.1838,
+      "attributes": {
+        "max_vectors": 100000000,
+        "min_team": 10,
+        "deployment": [
+          "self-hosted"
+        ],
+        "cost_tier": 2,
+        "new_infra_required": true
+      }
+    },
+    {
+      "evidence_id": "E7",
+      "source": {
+        "source_id": "S7",
+        "kind": "kb",
+        "title": "Helios 成本（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-helios-cost",
+        "locator": "§3 成本",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "1eab0f42c4620d004157c40b7dcafe552dfbb87bb5259eebeccb87d2d2718682",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；",
+      "quote": "Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；官方建议至少 10 人平台团队负责日常运维与升级。",
+      "topic": "vector-db",
+      "object_name": "helios",
+      "aspect": "cost",
+      "route": "kb",
+      "score": 2.1895,
+      "attributes": {
+        "max_vectors": 100000000,
+        "min_team": 10,
+        "deployment": [
+          "self-hosted"
+        ],
+        "cost_tier": 2,
+        "new_infra_required": true
+      }
+    },
+    {
+      "evidence_id": "E8",
+      "source": {
+        "source_id": "S8",
+        "kind": "kb",
+        "title": "Helios 成熟度（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-helios-maturity",
+        "locator": "§4 成熟度",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "a13c1a137bea75781a741b930bf8ba6b34d7e221bf42bfdbe8f60b7df8700654",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Helios 在大型企业有亿级向量案例，版本节奏稳定；",
+      "quote": "Helios 在大型企业有亿级向量案例，版本节奏稳定；但分布式组件多，故障定位链路长，需要专职平台团队。",
+      "topic": "vector-db",
+      "object_name": "helios",
+      "aspect": "maturity",
+      "route": "kb",
+      "score": 4.6451,
+      "attributes": {
+        "max_vectors": 100000000,
+        "min_team": 10,
+        "deployment": [
+          "self-hosted"
+        ],
+        "cost_tier": 2,
+        "new_infra_required": true
+      }
+    },
+    {
+      "evidence_id": "E9",
+      "source": {
+        "source_id": "S9",
+        "kind": "kb",
+        "title": "Nebula 性能（离线 fixture，缺少结构化属性）",
+        "url": null,
+        "doc_id": "fixture-nebula-perf",
+        "locator": "§1 容量",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "b501c3142f034ddf719effc3b04bdb57aed493b03a41703e84a474303d4ad61e",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。",
+      "quote": "Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。",
+      "topic": "vector-db",
+      "object_name": "nebula",
+      "aspect": "performance",
+      "route": "kb",
+      "score": 2.625,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E10",
+      "source": {
+        "source_id": "S10",
+        "kind": "kb",
+        "title": "Nebula 成熟度（离线 fixture，缺少结构化属性）",
+        "url": null,
+        "doc_id": "fixture-nebula-maturity",
+        "locator": "§4 成熟度",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "782235de026466092d823f00a8a3611ad09d9c7697280a321ac7cae8ebee8c89",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。",
+      "quote": "Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。",
+      "topic": "vector-db",
+      "object_name": "nebula",
+      "aspect": "maturity",
+      "route": "kb",
+      "score": 1.1479,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E11",
+      "source": {
+        "source_id": "S11",
+        "kind": "kb",
+        "title": "pgvector 性能与容量（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-pgvector-perf",
+        "locator": "§1 容量",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "edcb672aace24c40a3e3650f8a8dc41cc3e5586d8167d3e504b9ef0f1efac3fa",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；",
+      "quote": "pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；达到 500 万条 768 维时查询延迟仍可控。",
+      "topic": "vector-db",
+      "object_name": "pgvector",
+      "aspect": "performance",
+      "route": "kb",
+      "score": 5.3136,
+      "attributes": {
+        "max_vectors": 10000000,
+        "min_team": 2,
+        "deployment": [
+          "self-hosted"
+        ],
+        "cost_tier": 0,
+        "new_infra_required": false,
+        "supports_stack": [
+          "postgresql"
+        ]
+      }
+    },
+    {
+      "evidence_id": "E12",
+      "source": {
+        "source_id": "S12",
+        "kind": "kb",
+        "title": "pgvector 生态（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-pgvector-eco",
+        "locator": "§2 生态",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "e2e45695a9d2b49bd07a9191c3d9de17013b795b32f4184975ba9349dadc14ea",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。",
+      "quote": "pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。",
+      "topic": "vector-db",
+      "object_name": "pgvector",
+      "aspect": "ecosystem",
+      "route": "kb",
+      "score": 8.9546,
+      "attributes": {
+        "max_vectors": 10000000,
+        "min_team": 2,
+        "deployment": [
+          "self-hosted"
+        ],
+        "cost_tier": 0,
+        "new_infra_required": false,
+        "supports_stack": [
+          "postgresql"
+        ]
+      }
+    },
+    {
+      "evidence_id": "E13",
+      "source": {
+        "source_id": "S13",
+        "kind": "kb",
+        "title": "pgvector 成本（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-pgvector-cost",
+        "locator": "§3 成本",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "ead46c6fb62cbe78f558493ce65765f937b1f3a2df1a7873c3f5d8e7572eefbe",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；",
+      "quote": "pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；主要成本是索引构建与查询带来的 CPU/内存开销。",
+      "topic": "vector-db",
+      "object_name": "pgvector",
+      "aspect": "cost",
+      "route": "kb",
+      "score": 8.6778,
+      "attributes": {
+        "max_vectors": 10000000,
+        "min_team": 2,
+        "deployment": [
+          "self-hosted"
+        ],
+        "cost_tier": 0,
+        "new_infra_required": false,
+        "supports_stack": [
+          "postgresql"
+        ]
+      }
+    },
+    {
+      "evidence_id": "E14",
+      "source": {
+        "source_id": "S14",
+        "kind": "kb",
+        "title": "pgvector 成熟度（离线 fixture）",
+        "url": null,
+        "doc_id": "fixture-pgvector-maturity",
+        "locator": "§4 成熟度",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "125f0dc273e9031ba28624f0030806c340324106c87d8c8d4d14ed44650a8c6d",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；",
+      "quote": "pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；功能迭代速度慢于专用向量库，但运维路径成熟。",
+      "topic": "vector-db",
+      "object_name": "pgvector",
+      "aspect": "maturity",
+      "route": "kb",
+      "score": 5.9497,
+      "attributes": {
+        "max_vectors": 10000000,
+        "min_team": 2,
+        "deployment": [
+          "self-hosted"
+        ],
+        "cost_tier": 0,
+        "new_infra_required": false,
+        "supports_stack": [
+          "postgresql"
+        ]
+      }
+    }
+  ],
+  "evidence_disposition": [
+    {
+      "evidence_key": "kb:fixture-helios-perf:§1 容量",
+      "claim": "Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-helios-perf §1 容量 (kb)",
+      "source_title": "Helios 性能与容量（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-eco:§2 生态",
+      "claim": "Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-eco §2 生态 (kb)",
+      "source_title": "Atlas 生态（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E2"
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-perf:§1 容量",
+      "claim": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-perf §1 容量 (kb)",
+      "source_title": "Atlas 性能与容量（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E1"
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-eco:§2 生态",
+      "claim": "pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-eco §2 生态 (kb)",
+      "source_title": "pgvector 生态（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-cost:§3 成本",
+      "claim": "pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-cost §3 成本 (kb)",
+      "source_title": "pgvector 成本（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-cost:§3 成本",
+      "claim": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-cost §3 成本 (kb)",
+      "source_title": "Atlas 成本（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E3"
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-maturity:§4 成熟度",
+      "claim": "pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-maturity §4 成熟度 (kb)",
+      "source_title": "pgvector 成熟度（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-perf:§1 容量",
+      "claim": "pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-perf §1 容量 (kb)",
+      "source_title": "pgvector 性能与容量（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-nebula-perf:§1 容量",
+      "claim": "Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-nebula-perf §1 容量 (kb)",
+      "source_title": "Nebula 性能（离线 fixture，缺少结构化属性）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E9"
+    },
+    {
+      "evidence_key": "kb:fixture-helios-maturity:§4 成熟度",
+      "claim": "Helios 在大型企业有亿级向量案例，版本节奏稳定；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-helios-maturity §4 成熟度 (kb)",
+      "source_title": "Helios 成熟度（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-maturity:§4 成熟度",
+      "claim": "Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-maturity §4 成熟度 (kb)",
+      "source_title": "Atlas 成熟度（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E4"
+    },
+    {
+      "evidence_key": "kb:fixture-nebula-maturity:§4 成熟度",
+      "claim": "Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-nebula-maturity §4 成熟度 (kb)",
+      "source_title": "Nebula 成熟度（离线 fixture，缺少结构化属性）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E10"
+    },
+    {
+      "evidence_key": "kb:fixture-helios-perf:§1 容量",
+      "claim": "Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-helios-perf §1 容量 (kb)",
+      "source_title": "Helios 性能与容量（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E5"
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-eco:§2 生态",
+      "claim": "pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-eco §2 生态 (kb)",
+      "source_title": "pgvector 生态（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-eco:§2 生态",
+      "claim": "Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-eco §2 生态 (kb)",
+      "source_title": "Atlas 生态（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-cost:§3 成本",
+      "claim": "pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-cost §3 成本 (kb)",
+      "source_title": "pgvector 成本（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-helios-maturity:§4 成熟度",
+      "claim": "Helios 在大型企业有亿级向量案例，版本节奏稳定；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-helios-maturity §4 成熟度 (kb)",
+      "source_title": "Helios 成熟度（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E8"
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-perf:§1 容量",
+      "claim": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-perf §1 容量 (kb)",
+      "source_title": "Atlas 性能与容量（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-maturity:§4 成熟度",
+      "claim": "pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-maturity §4 成熟度 (kb)",
+      "source_title": "pgvector 成熟度（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-perf:§1 容量",
+      "claim": "pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-perf §1 容量 (kb)",
+      "source_title": "pgvector 性能与容量（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-nebula-perf:§1 容量",
+      "claim": "Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-nebula-perf §1 容量 (kb)",
+      "source_title": "Nebula 性能（离线 fixture，缺少结构化属性）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-cost:§3 成本",
+      "claim": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-cost §3 成本 (kb)",
+      "source_title": "Atlas 成本（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-helios-cost:§3 成本",
+      "claim": "Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-helios-cost §3 成本 (kb)",
+      "source_title": "Helios 成本（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E7"
+    },
+    {
+      "evidence_key": "kb:fixture-helios-eco:§2 生态",
+      "claim": "Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-helios-eco §2 生态 (kb)",
+      "source_title": "Helios 生态（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E6"
+    },
+    {
+      "evidence_key": "kb:fixture-nebula-maturity:§4 成熟度",
+      "claim": "Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-nebula-maturity §4 成熟度 (kb)",
+      "source_title": "Nebula 成熟度（离线 fixture，缺少结构化属性）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-helios-perf:§1 容量",
+      "claim": "Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-helios-perf §1 容量 (kb)",
+      "source_title": "Helios 性能与容量（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-eco:§2 生态",
+      "claim": "pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-eco §2 生态 (kb)",
+      "source_title": "pgvector 生态（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E12"
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-cost:§3 成本",
+      "claim": "pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-cost §3 成本 (kb)",
+      "source_title": "pgvector 成本（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E13"
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-eco:§2 生态",
+      "claim": "Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-eco §2 生态 (kb)",
+      "source_title": "Atlas 生态（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-maturity:§4 成熟度",
+      "claim": "pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-maturity §4 成熟度 (kb)",
+      "source_title": "pgvector 成熟度（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E14"
+    },
+    {
+      "evidence_key": "kb:fixture-pgvector-perf:§1 容量",
+      "claim": "pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-pgvector-perf §1 容量 (kb)",
+      "source_title": "pgvector 性能与容量（离线 fixture）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E11"
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-perf:§1 容量",
+      "claim": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-perf §1 容量 (kb)",
+      "source_title": "Atlas 性能与容量（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-nebula-perf:§1 容量",
+      "claim": "Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-nebula-perf §1 容量 (kb)",
+      "source_title": "Nebula 性能（离线 fixture，缺少结构化属性）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-helios-maturity:§4 成熟度",
+      "claim": "Helios 在大型企业有亿级向量案例，版本节奏稳定；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-helios-maturity §4 成熟度 (kb)",
+      "source_title": "Helios 成熟度（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-atlas-cost:§3 成本",
+      "claim": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-atlas-cost §3 成本 (kb)",
+      "source_title": "Atlas 成本（离线 fixture）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:fixture-nebula-maturity:§4 成熟度",
+      "claim": "Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。",
+      "source_kind": "kb",
+      "source_ref": "doc:fixture-nebula-maturity §4 成熟度 (kb)",
+      "source_title": "Nebula 成熟度（离线 fixture，缺少结构化属性）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    }
+  ],
+  "constraints": [
+    {
+      "constraint_id": "C1",
+      "kind": "scale",
+      "text": "500 万条 768 维向量",
+      "value": "5000000",
+      "unit": "vectors",
+      "source": "user"
+    },
+    {
+      "constraint_id": "C2",
+      "kind": "team",
+      "text": "5 人",
+      "value": "5",
+      "unit": "people",
+      "source": "user"
+    },
+    {
+      "constraint_id": "C3",
+      "kind": "cost",
+      "text": "低成本/预算有限",
+      "value": "low",
+      "unit": "tier",
+      "source": "user"
+    },
+    {
+      "constraint_id": "C4",
+      "kind": "deployment",
+      "text": "自托管",
+      "value": "self-hosted",
+      "unit": "",
+      "source": "user"
+    },
+    {
+      "constraint_id": "C5",
+      "kind": "stack",
+      "text": "不引入新数据库/中间件",
+      "value": "no_new_infra",
+      "unit": "policy",
+      "source": "user"
+    }
+  ],
+  "constraint_summary": {
+    "verdict": "recommend",
+    "recommended_objects": [
+      "pgvector"
+    ],
+    "excluded": {
+      "atlas": [
+        "C5"
+      ],
+      "helios": [
+        "C2",
+        "C3",
+        "C5"
+      ]
+    },
+    "unknown_objects": [],
+    "findings": [
+      {
+        "constraint_id": "C1",
+        "object_name": "atlas",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E1",
+          "E2",
+          "E3",
+          "E4"
+        ],
+        "detail": "支持上限 10,000,000 / 要求 5,000,000"
+      },
+      {
+        "constraint_id": "C2",
+        "object_name": "atlas",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E1",
+          "E2",
+          "E3",
+          "E4"
+        ],
+        "detail": "最低团队 2 人 / 可用 5 人"
+      },
+      {
+        "constraint_id": "C3",
+        "object_name": "atlas",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E1",
+          "E2",
+          "E3",
+          "E4"
+        ],
+        "detail": "成本等级 0 / 上限 0"
+      },
+      {
+        "constraint_id": "C4",
+        "object_name": "atlas",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E1",
+          "E2",
+          "E3",
+          "E4"
+        ],
+        "detail": "支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted"
+      },
+      {
+        "constraint_id": "C5",
+        "object_name": "atlas",
+        "status": "violated",
+        "evidence_ids": [
+          "E1",
+          "E2",
+          "E3",
+          "E4"
+        ],
+        "detail": "需要新基础设施=True"
+      },
+      {
+        "constraint_id": "C1",
+        "object_name": "helios",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E5",
+          "E6",
+          "E7",
+          "E8"
+        ],
+        "detail": "支持上限 100,000,000 / 要求 5,000,000"
+      },
+      {
+        "constraint_id": "C2",
+        "object_name": "helios",
+        "status": "violated",
+        "evidence_ids": [
+          "E5",
+          "E6",
+          "E7",
+          "E8"
+        ],
+        "detail": "最低团队 10 人 / 可用 5 人"
+      },
+      {
+        "constraint_id": "C3",
+        "object_name": "helios",
+        "status": "violated",
+        "evidence_ids": [
+          "E5",
+          "E6",
+          "E7",
+          "E8"
+        ],
+        "detail": "成本等级 2 / 上限 0"
+      },
+      {
+        "constraint_id": "C4",
+        "object_name": "helios",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E5",
+          "E6",
+          "E7",
+          "E8"
+        ],
+        "detail": "支持部署方式 ['self-hosted'] / 要求 self-hosted"
+      },
+      {
+        "constraint_id": "C5",
+        "object_name": "helios",
+        "status": "violated",
+        "evidence_ids": [
+          "E5",
+          "E6",
+          "E7",
+          "E8"
+        ],
+        "detail": "需要新基础设施=True"
+      },
+      {
+        "constraint_id": "C1",
+        "object_name": "pgvector",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E11",
+          "E12",
+          "E13",
+          "E14"
+        ],
+        "detail": "支持上限 10,000,000 / 要求 5,000,000"
+      },
+      {
+        "constraint_id": "C2",
+        "object_name": "pgvector",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E11",
+          "E12",
+          "E13",
+          "E14"
+        ],
+        "detail": "最低团队 2 人 / 可用 5 人"
+      },
+      {
+        "constraint_id": "C3",
+        "object_name": "pgvector",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E11",
+          "E12",
+          "E13",
+          "E14"
+        ],
+        "detail": "成本等级 0 / 上限 0"
+      },
+      {
+        "constraint_id": "C4",
+        "object_name": "pgvector",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E11",
+          "E12",
+          "E13",
+          "E14"
+        ],
+        "detail": "支持部署方式 ['self-hosted'] / 要求 self-hosted"
+      },
+      {
+        "constraint_id": "C5",
+        "object_name": "pgvector",
+        "status": "satisfied",
+        "evidence_ids": [
+          "E11",
+          "E12",
+          "E13",
+          "E14"
+        ],
+        "detail": "需要新基础设施=False"
+      }
+    ],
+    "gaps": [],
+    "checked_objects": [
+      "atlas",
+      "helios",
+      "pgvector"
+    ]
+  },
+  "guard_audit": {
+    "ran": false,
+    "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n**Helios**：性能：Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5]；生态：Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6]；成本：Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7]；成熟度：Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8]。\n\n**pgvector**：性能：pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11]；生态：pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12]；成本：pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13]；成熟度：pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14]。\n\n**Nebula**：性能：Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9]；成熟度：Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10]。\n\n## 约束核对\n\n- [C1] 500 万条 768 维向量：Atlas 满足（支持上限 10,000,000 / 要求 5,000,000）；Helios 满足（支持上限 100,000,000 / 要求 5,000,000）；pgvector 满足（支持上限 10,000,000 / 要求 5,000,000）\n- [C2] 5 人：Atlas 满足（最低团队 2 人 / 可用 5 人）；Helios 违反（最低团队 10 人 / 可用 5 人）；pgvector 满足（最低团队 2 人 / 可用 5 人）\n- [C3] 低成本/预算有限：Atlas 满足（成本等级 0 / 上限 0）；Helios 违反（成本等级 2 / 上限 0）；pgvector 满足（成本等级 0 / 上限 0）\n- [C4] 自托管：Atlas 满足（支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted）；Helios 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）；pgvector 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）\n- [C5] 不引入新数据库/中间件：Atlas 违反（需要新基础设施=True）；Helios 违反（需要新基础设施=True）；pgvector 满足（需要新基础设施=False）\n\n**约束结论**：在给定约束下，唯一满足全部可核验约束的是 pgvector；Atlas 违反 C5；Helios 违反 C2, C3, C5。\n\n## 分维度对比\n\n| 维度 | Atlas | Helios | pgvector | Nebula |\n|---|---|---|---|---|\n| 性能 | Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1] | Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5] | pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11] | Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9] |\n| 生态 | Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2] | Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6] | pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12] | —（本轮无证据） |\n| 成本 | Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3] | Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7] | pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13] | —（本轮无证据） |\n| 成熟度 | Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4] | Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8] | pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14] | Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10] |\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n- **[E5]** Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；（来源 [S5]：doc:fixture-helios-perf §1 容量 (kb)）\n- **[E6]** Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；（来源 [S6]：doc:fixture-helios-eco §2 生态 (kb)）\n- **[E7]** Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；（来源 [S7]：doc:fixture-helios-cost §3 成本 (kb)）\n- **[E8]** Helios 在大型企业有亿级向量案例，版本节奏稳定；（来源 [S8]：doc:fixture-helios-maturity §4 成熟度 (kb)）\n- **[E9]** Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。（来源 [S9]：doc:fixture-nebula-perf §1 容量 (kb)）\n- **[E10]** Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。（来源 [S10]：doc:fixture-nebula-maturity §4 成熟度 (kb)）\n- **[E11]** pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；（来源 [S11]：doc:fixture-pgvector-perf §1 容量 (kb)）\n- **[E12]** pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。（来源 [S12]：doc:fixture-pgvector-eco §2 生态 (kb)）\n- **[E13]** pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；（来源 [S13]：doc:fixture-pgvector-cost §3 成本 (kb)）\n- **[E14]** pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；（来源 [S14]：doc:fixture-pgvector-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n- **[S5]** Helios 性能与容量（离线 fixture） — doc:fixture-helios-perf §1 容量 (kb)\n- **[S6]** Helios 生态（离线 fixture） — doc:fixture-helios-eco §2 生态 (kb)\n- **[S7]** Helios 成本（离线 fixture） — doc:fixture-helios-cost §3 成本 (kb)\n- **[S8]** Helios 成熟度（离线 fixture） — doc:fixture-helios-maturity §4 成熟度 (kb)\n- **[S9]** Nebula 性能（离线 fixture，缺少结构化属性） — doc:fixture-nebula-perf §1 容量 (kb)\n- **[S10]** Nebula 成熟度（离线 fixture，缺少结构化属性） — doc:fixture-nebula-maturity §4 成熟度 (kb)\n- **[S11]** pgvector 性能与容量（离线 fixture） — doc:fixture-pgvector-perf §1 容量 (kb)\n- **[S12]** pgvector 生态（离线 fixture） — doc:fixture-pgvector-eco §2 生态 (kb)\n- **[S13]** pgvector 成本（离线 fixture） — doc:fixture-pgvector-cost §3 成本 (kb)\n- **[S14]** pgvector 成熟度（离线 fixture） — doc:fixture-pgvector-maturity §4 成熟度 (kb)\n",
+    "final_markdown": "# 技术选型研究报告\n\n> 研究问题：我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n**Helios**：性能：Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5]；生态：Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6]；成本：Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7]；成熟度：Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8]。\n\n**pgvector**：性能：pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11]；生态：pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12]；成本：pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13]；成熟度：pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14]。\n\n**Nebula**：性能：Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9]；成熟度：Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10]。\n\n## 约束核对\n\n- [C1] 500 万条 768 维向量：Atlas 满足（支持上限 10,000,000 / 要求 5,000,000）；Helios 满足（支持上限 100,000,000 / 要求 5,000,000）；pgvector 满足（支持上限 10,000,000 / 要求 5,000,000）\n- [C2] 5 人：Atlas 满足（最低团队 2 人 / 可用 5 人）；Helios 违反（最低团队 10 人 / 可用 5 人）；pgvector 满足（最低团队 2 人 / 可用 5 人）\n- [C3] 低成本/预算有限：Atlas 满足（成本等级 0 / 上限 0）；Helios 违反（成本等级 2 / 上限 0）；pgvector 满足（成本等级 0 / 上限 0）\n- [C4] 自托管：Atlas 满足（支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted）；Helios 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）；pgvector 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）\n- [C5] 不引入新数据库/中间件：Atlas 违反（需要新基础设施=True）；Helios 违反（需要新基础设施=True）；pgvector 满足（需要新基础设施=False）\n\n**约束结论**：在给定约束下，唯一满足全部可核验约束的是 pgvector；Atlas 违反 C5；Helios 违反 C2, C3, C5。\n\n## 分维度对比\n\n| 维度 | Atlas | Helios | pgvector | Nebula |\n|---|---|---|---|---|\n| 性能 | Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1] | Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5] | pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11] | Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9] |\n| 生态 | Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2] | Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6] | pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12] | —（本轮无证据） |\n| 成本 | Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3] | Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7] | pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13] | —（本轮无证据） |\n| 成熟度 | Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4] | Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8] | pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14] | Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10] |\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n- **[E5]** Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；（来源 [S5]：doc:fixture-helios-perf §1 容量 (kb)）\n- **[E6]** Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；（来源 [S6]：doc:fixture-helios-eco §2 生态 (kb)）\n- **[E7]** Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；（来源 [S7]：doc:fixture-helios-cost §3 成本 (kb)）\n- **[E8]** Helios 在大型企业有亿级向量案例，版本节奏稳定；（来源 [S8]：doc:fixture-helios-maturity §4 成熟度 (kb)）\n- **[E9]** Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。（来源 [S9]：doc:fixture-nebula-perf §1 容量 (kb)）\n- **[E10]** Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。（来源 [S10]：doc:fixture-nebula-maturity §4 成熟度 (kb)）\n- **[E11]** pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；（来源 [S11]：doc:fixture-pgvector-perf §1 容量 (kb)）\n- **[E12]** pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。（来源 [S12]：doc:fixture-pgvector-eco §2 生态 (kb)）\n- **[E13]** pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；（来源 [S13]：doc:fixture-pgvector-cost §3 成本 (kb)）\n- **[E14]** pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；（来源 [S14]：doc:fixture-pgvector-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n- **[S5]** Helios 性能与容量（离线 fixture） — doc:fixture-helios-perf §1 容量 (kb)\n- **[S6]** Helios 生态（离线 fixture） — doc:fixture-helios-eco §2 生态 (kb)\n- **[S7]** Helios 成本（离线 fixture） — doc:fixture-helios-cost §3 成本 (kb)\n- **[S8]** Helios 成熟度（离线 fixture） — doc:fixture-helios-maturity §4 成熟度 (kb)\n- **[S9]** Nebula 性能（离线 fixture，缺少结构化属性） — doc:fixture-nebula-perf §1 容量 (kb)\n- **[S10]** Nebula 成熟度（离线 fixture，缺少结构化属性） — doc:fixture-nebula-maturity §4 成熟度 (kb)\n- **[S11]** pgvector 性能与容量（离线 fixture） — doc:fixture-pgvector-perf §1 容量 (kb)\n- **[S12]** pgvector 生态（离线 fixture） — doc:fixture-pgvector-eco §2 生态 (kb)\n- **[S13]** pgvector 成本（离线 fixture） — doc:fixture-pgvector-cost §3 成本 (kb)\n- **[S14]** pgvector 成熟度（离线 fixture） — doc:fixture-pgvector-maturity §4 成熟度 (kb)\n",
+    "diff": "",
+    "invalid_citation_ids": [],
+    "rewrite_attempted": false,
+    "rewrite_accepted": null,
+    "rewrite_rejected_reason": null,
+    "claims_checked": 0,
+    "claims_quarantined": 0,
+    "actions": [
+      {
+        "action": "not_run",
+        "detail": "离线模板合成，无模型引用需要校验"
+      }
+    ],
+    "unverified_claims": [],
+    "fallback_used": false,
+    "fail_closed": false
+  },
+  "unverified_claims": [],
+  "meta": {
+    "routes_used": [
+      "kb"
+    ],
+    "routes_attempted": [
+      "kb",
+      "web"
+    ],
+    "degraded": false,
+    "plan_rounds": 1,
+    "step_count": 4,
+    "token_usage": 0,
+    "information_gaps": []
+  }
+}

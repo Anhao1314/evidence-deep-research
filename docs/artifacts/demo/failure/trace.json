@@ -1,0 +1,404 @@
+{
+  "trace_id": "demo-failure",
+  "event_count": 23,
+  "token_usage": 0,
+  "events": [
+    {
+      "seq": 1,
+      "ts": "2026-10-28T19:28:38.343+00:00",
+      "node": "load_context",
+      "event_type": "memory_recall",
+      "payload": {
+        "preferences": {},
+        "related_topics": 0,
+        "snippets": 0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 2,
+      "ts": "2026-10-28T19:28:38.344+00:00",
+      "node": "plan",
+      "event_type": "plan",
+      "payload": {
+        "plan_id": "plan-3532e8f7",
+        "subtasks": [
+          {
+            "subtask_id": "T304f94",
+            "route": "kb",
+            "topic": "vector-db",
+            "object_name": "qdrant",
+            "object_display": "Qdrant",
+            "aspect": "general",
+            "query": "Qdrant 向量数据库"
+          },
+          {
+            "subtask_id": "Tc7f6a6",
+            "route": "web",
+            "topic": "vector-db",
+            "object_name": "qdrant",
+            "object_display": "Qdrant",
+            "aspect": "general",
+            "query": "Qdrant 向量数据库"
+          },
+          {
+            "subtask_id": "T3553bb",
+            "route": "kb",
+            "topic": "vector-db",
+            "object_name": "milvus",
+            "object_display": "Milvus",
+            "aspect": "general",
+            "query": "Milvus 向量数据库"
+          },
+          {
+            "subtask_id": "Tbbb558",
+            "route": "web",
+            "topic": "vector-db",
+            "object_name": "milvus",
+            "object_display": "Milvus",
+            "aspect": "general",
+            "query": "Milvus 向量数据库"
+          }
+        ],
+        "rationale": "启发式规则：命中主题 vector-db，对象 ['qdrant', 'milvus']",
+        "is_duplicate": false,
+        "round": 1,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 3,
+      "ts": "2026-10-28T19:28:38.344+00:00",
+      "node": "dispatch",
+      "event_type": "dispatch",
+      "payload": {
+        "fan_out": 4,
+        "targets": [
+          "rag_agent",
+          "web_agent",
+          "rag_agent",
+          "web_agent"
+        ],
+        "subtask_ids": [
+          "T304f94",
+          "Tc7f6a6",
+          "T3553bb",
+          "Tbbb558"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 4,
+      "ts": "2026-10-28T19:28:38.345+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "T304f94",
+        "query": "Qdrant 向量数据库",
+        "top_k": 8,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 5,
+      "ts": "2026-10-28T19:28:38.345+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "Tc7f6a6",
+        "query": "Qdrant 向量数据库",
+        "top_k": 4,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 6,
+      "ts": "2026-10-28T19:28:38.346+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "T3553bb",
+        "query": "Milvus 向量数据库",
+        "top_k": 8,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 7,
+      "ts": "2026-10-28T19:28:38.347+00:00",
+      "node": "rag_agent",
+      "event_type": "retry",
+      "payload": {
+        "route": "kb",
+        "subtask_id": "T304f94",
+        "attempt": 0,
+        "error": "第1次尝试失败: demo fault injection: MCP KB connection reset"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 8,
+      "ts": "2026-10-28T19:28:38.347+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "Tbbb558",
+        "query": "Milvus 向量数据库",
+        "top_k": 4,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 9,
+      "ts": "2026-10-28T19:28:38.347+00:00",
+      "node": "web_agent",
+      "event_type": "retry",
+      "payload": {
+        "route": "web",
+        "subtask_id": "Tc7f6a6",
+        "attempt": 0,
+        "error": "第1次尝试失败: demo fault injection: search API timeout"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 10,
+      "ts": "2026-10-28T19:28:38.347+00:00",
+      "node": "rag_agent",
+      "event_type": "retry",
+      "payload": {
+        "route": "kb",
+        "subtask_id": "T3553bb",
+        "attempt": 0,
+        "error": "第1次尝试失败: demo fault injection: MCP KB connection reset"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 11,
+      "ts": "2026-10-28T19:28:38.348+00:00",
+      "node": "rag_agent",
+      "event_type": "retry",
+      "payload": {
+        "route": "kb",
+        "subtask_id": "T304f94",
+        "attempt": 1,
+        "error": "第2次尝试失败: demo fault injection: MCP KB connection reset"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 12,
+      "ts": "2026-10-28T19:28:38.348+00:00",
+      "node": "web_agent",
+      "event_type": "retry",
+      "payload": {
+        "route": "web",
+        "subtask_id": "Tbbb558",
+        "attempt": 0,
+        "error": "第1次尝试失败: demo fault injection: search API timeout"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 13,
+      "ts": "2026-10-28T19:28:38.348+00:00",
+      "node": "web_agent",
+      "event_type": "retry",
+      "payload": {
+        "route": "web",
+        "subtask_id": "Tbbb558",
+        "attempt": 1,
+        "error": "第2次尝试失败: demo fault injection: search API timeout"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 14,
+      "ts": "2026-10-28T19:28:38.349+00:00",
+      "node": "rag_agent",
+      "event_type": "retry",
+      "payload": {
+        "route": "kb",
+        "subtask_id": "T3553bb",
+        "attempt": 1,
+        "error": "第2次尝试失败: demo fault injection: MCP KB connection reset"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 15,
+      "ts": "2026-10-28T19:28:38.349+00:00",
+      "node": "rag_agent",
+      "event_type": "degrade",
+      "payload": {
+        "route": "kb",
+        "subtask_id": "T304f94",
+        "latency_ms": 2.74,
+        "error": "第2次尝试失败: demo fault injection: MCP KB connection reset"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 16,
+      "ts": "2026-10-28T19:28:38.349+00:00",
+      "node": "web_agent",
+      "event_type": "retry",
+      "payload": {
+        "route": "web",
+        "subtask_id": "Tc7f6a6",
+        "attempt": 1,
+        "error": "第2次尝试失败: demo fault injection: search API timeout"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 17,
+      "ts": "2026-10-28T19:28:38.350+00:00",
+      "node": "web_agent",
+      "event_type": "degrade",
+      "payload": {
+        "route": "web",
+        "subtask_id": "Tbbb558",
+        "latency_ms": 1.26,
+        "error": "第2次尝试失败: demo fault injection: search API timeout"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 18,
+      "ts": "2026-10-28T19:28:38.352+00:00",
+      "node": "rag_agent",
+      "event_type": "degrade",
+      "payload": {
+        "route": "kb",
+        "subtask_id": "T3553bb",
+        "latency_ms": 2.05,
+        "error": "第2次尝试失败: demo fault injection: MCP KB connection reset"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 19,
+      "ts": "2026-10-28T19:28:38.352+00:00",
+      "node": "web_agent",
+      "event_type": "degrade",
+      "payload": {
+        "route": "web",
+        "subtask_id": "Tc7f6a6",
+        "latency_ms": 4.73,
+        "error": "第2次尝试失败: demo fault injection: search API timeout"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 20,
+      "ts": "2026-10-28T19:28:38.353+00:00",
+      "node": "merge",
+      "event_type": "merge",
+      "payload": {
+        "raw_evidences": 0,
+        "after_scope": 0,
+        "deduped": 0,
+        "after_budget_and_prefs": 0,
+        "excluded_by_reason": {},
+        "excluded": [],
+        "coverage": {}
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 21,
+      "ts": "2026-10-28T19:28:38.353+00:00",
+      "node": "verify",
+      "event_type": "verify",
+      "payload": {
+        "gaps": [
+          "Qdrant 缺少维度证据：性能、生态、成本、成熟度",
+          "Milvus 缺少维度证据：性能、生态、成本、成熟度",
+          "kb 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset",
+          "web 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout",
+          "kb 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset",
+          "web 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout"
+        ],
+        "replan": true,
+        "constraint_summary": {
+          "verdict": "not_checked",
+          "recommended_objects": [],
+          "excluded": {},
+          "unknown_objects": [],
+          "findings": [],
+          "gaps": [],
+          "checked_objects": []
+        }
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 22,
+      "ts": "2026-10-28T19:28:38.354+00:00",
+      "node": "synthesize",
+      "event_type": "synthesize",
+      "payload": {
+        "markdown_chars": 483,
+        "citations": 0,
+        "evidences": 0,
+        "sources": 0,
+        "degraded": true,
+        "guard_ran": false,
+        "guard_quarantined": 0,
+        "guard_fallback": false,
+        "constraint_verdict": "not_checked"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 23,
+      "ts": "2026-10-28T19:28:38.354+00:00",
+      "node": "persist",
+      "event_type": "persist",
+      "payload": {
+        "topic_recorded": true,
+        "snippets": 0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    }
+  ]
+}

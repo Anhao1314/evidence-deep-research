@@ -13,6 +13,7 @@ aspect 级补充子任务，且不与历史计划重复。
 
 import uuid
 
+from app.constraints import extract_constraints
 from app.domain_registry import ASPECT_ZH, DomainRegistry
 from app.llm.base import ComposeContext, ComposeResult, PlanContext
 from app.report.synth import render_compose_result
@@ -39,8 +40,9 @@ class HeuristicProvider:
 
     def _plan_initial(self, ctx: PlanContext) -> Plan:
         match = self.registry.match_question(ctx.question)
+        constraints = ctx.constraints or extract_constraints(ctx.question)
         if match is None:
-            return self._plan_generic(ctx)
+            return self._plan_generic(ctx, constraints)
         subtasks: list[SubTask] = []
         objects = match.matched_objects or [""]
         for obj in objects:
@@ -58,13 +60,14 @@ class HeuristicProvider:
         if ctx.related_history:
             hist = "；".join(h["question"] for h in ctx.related_history)
             rationale += f"；记忆召回相关历史研究：{hist}"
-        return Plan(plan_id=self._new_id(), subtasks=subtasks, rationale=rationale)
+        return Plan(plan_id=self._new_id(), subtasks=subtasks, rationale=rationale,
+                    constraints=constraints)
 
     def _plan_replan(self, ctx: PlanContext) -> Plan:
         subtasks: list[SubTask] = []
         for gap in ctx.replan_focus:
             topic, obj = gap.get("topic", ""), gap.get("object", "")
-            for aspect in gap.get("missing_aspects", [])[:1]:  # 每对象只补最重要的一个缺口
+            for aspect in gap.get("missing_aspects", []):  # 补齐全部缺口维度，而不是只补一个
                 for route in SUBTASK_ROUTES:
                     subtasks.append(
                         self._make_subtask(
@@ -79,9 +82,10 @@ class HeuristicProvider:
             plan_id=self._new_id(),
             subtasks=subtasks,
             rationale="启发式规则：针对信息缺口的补充检索",
+            constraints=ctx.constraints or extract_constraints(ctx.question),
         )
 
-    def _plan_generic(self, ctx: PlanContext) -> Plan:
+    def _plan_generic(self, ctx: PlanContext, constraints: list) -> Plan:
         query = ctx.question[:60]
         subtasks = [
             self._make_subtask(route=route, topic="", object_name="", aspect="general", query=query)
@@ -91,6 +95,7 @@ class HeuristicProvider:
             plan_id=self._new_id(),
             subtasks=subtasks,
             rationale="启发式规则：领域外问题，泛化检索降级",
+            constraints=constraints,
         )
 
     def _make_subtask(

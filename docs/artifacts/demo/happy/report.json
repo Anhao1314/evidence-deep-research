@@ -1,0 +1,814 @@
+{
+  "report_id": "demo-happy",
+  "question": "RAG 系统的向量库选 Qdrant 还是 Milvus？",
+  "trace_id": "demo-happy",
+  "markdown": "# 技术选型研究报告\n\n> 研究问题：RAG 系统的向量库选 Qdrant 还是 Milvus？\n\n## 结论摘要\n\n**Qdrant**：性能：Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8]；生态：Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10]；成本：Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11]；成熟度：Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12]。\n\n**Milvus**：性能：VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1]；生态：Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4]；成本：Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5]；成熟度：Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7]。\n\n## 分维度对比\n\n| 维度 | Qdrant | Milvus |\n|---|---|---|\n| 性能 | Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8] | VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1] |\n| 生态 | Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10] | Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4] |\n| 成本 | Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11] | Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5] |\n| 成熟度 | Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12] | Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7] |\n\n## 证据明细\n\n- **[E1]** VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；（来源 [S1]：doc:kb-vdb-bench §5 基准 (kb)）\n- **[E2]** Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。（来源 [S2]：doc:kb-milvus-perf §1 架构与延迟 (kb)）\n- **[E3]** GPU 索引让亿级向量检索吞吐提升 10 倍量级。（来源 [S3]：https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)）\n- **[E4]** Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。（来源 [S4]：doc:kb-milvus-eco §2 生态 (kb)）\n- **[E5]** Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。（来源 [S5]：doc:kb-milvus-cost §3 成本 (kb)）\n- **[E6]** 托管 Milvus 按存储与 CU 计费，起步价高于自托管。（来源 [S6]：https://zilliz.com/pricing 2025-01-15 (web)）\n- **[E7]** Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。（来源 [S7]：doc:kb-milvus-maturity §4 成熟度 (kb)）\n- **[E8]** Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。（来源 [S8]：https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)）\n- **[E9]** Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。（来源 [S9]：doc:kb-qdrant-perf §1 架构与延迟 (kb)）\n- **[E10]** Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。（来源 [S10]：doc:kb-qdrant-eco §2 生态 (kb)）\n- **[E11]** Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。（来源 [S11]：doc:kb-qdrant-cost §3 成本 (kb)）\n- **[E12]** Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。（来源 [S12]：doc:kb-qdrant-maturity §4 成熟度 (kb)）\n- **[E13]** 社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。（来源 [S13]：https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** 向量库公开基准快照（演示数据） — doc:kb-vdb-bench §5 基准 (kb)\n- **[S2]** Milvus 性能架构（演示快照） — doc:kb-milvus-perf §1 架构与延迟 (kb)\n- **[S3]** Accelerating Milvus with NVIDIA CAGRA GPU Index — https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)\n- **[S4]** Milvus 生态与集成（演示快照） — doc:kb-milvus-eco §2 生态 (kb)\n- **[S5]** Milvus 部署与成本（演示快照） — doc:kb-milvus-cost §3 成本 (kb)\n- **[S6]** Zilliz Cloud Pricing — https://zilliz.com/pricing 2025-01-15 (web)\n- **[S7]** Milvus 成熟度（演示快照） — doc:kb-milvus-maturity §4 成熟度 (kb)\n- **[S8]** Qdrant Documentation - Distributed Deployment — https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)\n- **[S9]** Qdrant 性能架构（演示快照） — doc:kb-qdrant-perf §1 架构与延迟 (kb)\n- **[S10]** Qdrant 生态与集成（演示快照） — doc:kb-qdrant-eco §2 生态 (kb)\n- **[S11]** Qdrant 部署与成本（演示快照） — doc:kb-qdrant-cost §3 成本 (kb)\n- **[S12]** Qdrant 成熟度（演示快照） — doc:kb-qdrant-maturity §4 成熟度 (kb)\n- **[S13]** Qdrant vs Milvus for a 10M-vector RAG app? — https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)\n",
+  "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：RAG 系统的向量库选 Qdrant 还是 Milvus？\n\n## 结论摘要\n\n**Qdrant**：性能：Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8]；生态：Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10]；成本：Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11]；成熟度：Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12]。\n\n**Milvus**：性能：VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1]；生态：Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4]；成本：Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5]；成熟度：Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7]。\n\n## 分维度对比\n\n| 维度 | Qdrant | Milvus |\n|---|---|---|\n| 性能 | Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8] | VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1] |\n| 生态 | Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10] | Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4] |\n| 成本 | Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11] | Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5] |\n| 成熟度 | Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12] | Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7] |\n\n## 证据明细\n\n- **[E1]** VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；（来源 [S1]：doc:kb-vdb-bench §5 基准 (kb)）\n- **[E2]** Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。（来源 [S2]：doc:kb-milvus-perf §1 架构与延迟 (kb)）\n- **[E3]** GPU 索引让亿级向量检索吞吐提升 10 倍量级。（来源 [S3]：https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)）\n- **[E4]** Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。（来源 [S4]：doc:kb-milvus-eco §2 生态 (kb)）\n- **[E5]** Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。（来源 [S5]：doc:kb-milvus-cost §3 成本 (kb)）\n- **[E6]** 托管 Milvus 按存储与 CU 计费，起步价高于自托管。（来源 [S6]：https://zilliz.com/pricing 2025-01-15 (web)）\n- **[E7]** Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。（来源 [S7]：doc:kb-milvus-maturity §4 成熟度 (kb)）\n- **[E8]** Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。（来源 [S8]：https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)）\n- **[E9]** Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。（来源 [S9]：doc:kb-qdrant-perf §1 架构与延迟 (kb)）\n- **[E10]** Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。（来源 [S10]：doc:kb-qdrant-eco §2 生态 (kb)）\n- **[E11]** Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。（来源 [S11]：doc:kb-qdrant-cost §3 成本 (kb)）\n- **[E12]** Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。（来源 [S12]：doc:kb-qdrant-maturity §4 成熟度 (kb)）\n- **[E13]** 社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。（来源 [S13]：https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** 向量库公开基准快照（演示数据） — doc:kb-vdb-bench §5 基准 (kb)\n- **[S2]** Milvus 性能架构（演示快照） — doc:kb-milvus-perf §1 架构与延迟 (kb)\n- **[S3]** Accelerating Milvus with NVIDIA CAGRA GPU Index — https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)\n- **[S4]** Milvus 生态与集成（演示快照） — doc:kb-milvus-eco §2 生态 (kb)\n- **[S5]** Milvus 部署与成本（演示快照） — doc:kb-milvus-cost §3 成本 (kb)\n- **[S6]** Zilliz Cloud Pricing — https://zilliz.com/pricing 2025-01-15 (web)\n- **[S7]** Milvus 成熟度（演示快照） — doc:kb-milvus-maturity §4 成熟度 (kb)\n- **[S8]** Qdrant Documentation - Distributed Deployment — https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)\n- **[S9]** Qdrant 性能架构（演示快照） — doc:kb-qdrant-perf §1 架构与延迟 (kb)\n- **[S10]** Qdrant 生态与集成（演示快照） — doc:kb-qdrant-eco §2 生态 (kb)\n- **[S11]** Qdrant 部署与成本（演示快照） — doc:kb-qdrant-cost §3 成本 (kb)\n- **[S12]** Qdrant 成熟度（演示快照） — doc:kb-qdrant-maturity §4 成熟度 (kb)\n- **[S13]** Qdrant vs Milvus for a 10M-vector RAG app? — https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)\n",
+  "summary": "Qdrant：性能：Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。；生态：Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。；成本：Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。；成熟度：Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。。 Milvus：性能：VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）。；生态：Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。；成本：Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。；成熟度：Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。。",
+  "sources": [
+    {
+      "source_id": "S1",
+      "kind": "kb",
+      "title": "向量库公开基准快照（演示数据）",
+      "url": null,
+      "doc_id": "kb-vdb-bench",
+      "locator": "§5 基准",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "a19c6018451a91ca51b44d79b3e3e24d97b97867c91f4a9043e2a5433097391e",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S2",
+      "kind": "kb",
+      "title": "Milvus 性能架构（演示快照）",
+      "url": null,
+      "doc_id": "kb-milvus-perf",
+      "locator": "§1 架构与延迟",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "6d4757b0be2cb6feef414e5393aef4b2fe88ab2fd745f084e33005515395013b",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S3",
+      "kind": "web",
+      "title": "Accelerating Milvus with NVIDIA CAGRA GPU Index",
+      "url": "https://milvus.io/blog/accelerate-milvus-with-cagra.md",
+      "doc_id": null,
+      "locator": "2024-06-12",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "bb79e1f16cb122ce8f18d30b0c0a896074e1fa6cd094e2989cd22c7cb33d9cf3",
+      "resolution": "retrieval_snapshot",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S4",
+      "kind": "kb",
+      "title": "Milvus 生态与集成（演示快照）",
+      "url": null,
+      "doc_id": "kb-milvus-eco",
+      "locator": "§2 生态",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "46243f3e27210d36fdfbd7f0b60aa8c3372542666882168eec8dd8db1d1b8c7f",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S5",
+      "kind": "kb",
+      "title": "Milvus 部署与成本（演示快照）",
+      "url": null,
+      "doc_id": "kb-milvus-cost",
+      "locator": "§3 成本",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "2104b35840f93443b2dc6dca27d570ce43eecd9aedc1594d4c119c4713e7f10f",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S6",
+      "kind": "web",
+      "title": "Zilliz Cloud Pricing",
+      "url": "https://zilliz.com/pricing",
+      "doc_id": null,
+      "locator": "2025-01-15",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "ae813ef8ebceb151b5d0f44696110c77004dc4537bf8816fd5ae0f6bac3709fa",
+      "resolution": "retrieval_snapshot",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S7",
+      "kind": "kb",
+      "title": "Milvus 成熟度（演示快照）",
+      "url": null,
+      "doc_id": "kb-milvus-maturity",
+      "locator": "§4 成熟度",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "a93831b370a93056026210f7166a588098f2479531470db04c6f458561b90292",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S8",
+      "kind": "web",
+      "title": "Qdrant Documentation - Distributed Deployment",
+      "url": "https://qdrant.tech/documentation/guides/distributed_deployment/",
+      "doc_id": null,
+      "locator": "2025-03-01",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "2138445bb2435c87deaf257698576007de82ee2539ea5f124b3d4779528b1ee4",
+      "resolution": "retrieval_snapshot",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S9",
+      "kind": "kb",
+      "title": "Qdrant 性能架构（演示快照）",
+      "url": null,
+      "doc_id": "kb-qdrant-perf",
+      "locator": "§1 架构与延迟",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "72485bb8de94905996afe3f27b15ea1eafc8589f0ec9a0afb27bc99071845bc1",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S10",
+      "kind": "kb",
+      "title": "Qdrant 生态与集成（演示快照）",
+      "url": null,
+      "doc_id": "kb-qdrant-eco",
+      "locator": "§2 生态",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "550d0ee85946a17d22e7c4436247f049da46de986da42da6672d8a621ac0f8d9",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S11",
+      "kind": "kb",
+      "title": "Qdrant 部署与成本（演示快照）",
+      "url": null,
+      "doc_id": "kb-qdrant-cost",
+      "locator": "§3 成本",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "ae58f8d5b2157cc7864f02a425981f75ef473f26fe7e9dac803300f410fed7d5",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S12",
+      "kind": "kb",
+      "title": "Qdrant 成熟度（演示快照）",
+      "url": null,
+      "doc_id": "kb-qdrant-maturity",
+      "locator": "§4 成熟度",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "19d99fa111b17344d85e0223547b59e394359f6f72a2a62164b2152f89e43392",
+      "resolution": "kb_document",
+      "url_reachable": null
+    },
+    {
+      "source_id": "S13",
+      "kind": "web",
+      "title": "Qdrant vs Milvus for a 10M-vector RAG app?",
+      "url": "https://www.reddit.com/r/vector_database/comments/selection_2025/",
+      "doc_id": null,
+      "locator": "2025-05-20",
+      "retrieved_at": "2026-10-28T19:28:38+00:00",
+      "content_hash": "922098825e161f45fffd50bc7ae58d5abeac09e72873307255273653c416c34c",
+      "resolution": "retrieval_snapshot",
+      "url_reachable": null
+    }
+  ],
+  "citations": [
+    {
+      "location": "summary#qdrant",
+      "evidence_ids": [
+        "E10",
+        "E11",
+        "E12",
+        "E13",
+        "E8",
+        "E9"
+      ]
+    },
+    {
+      "location": "summary#milvus",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6",
+        "E7"
+      ]
+    },
+    {
+      "location": "table#performance#qdrant",
+      "evidence_ids": [
+        "E8",
+        "E9"
+      ]
+    },
+    {
+      "location": "table#performance#milvus",
+      "evidence_ids": [
+        "E1",
+        "E2",
+        "E3"
+      ]
+    },
+    {
+      "location": "table#ecosystem#qdrant",
+      "evidence_ids": [
+        "E10"
+      ]
+    },
+    {
+      "location": "table#ecosystem#milvus",
+      "evidence_ids": [
+        "E4"
+      ]
+    },
+    {
+      "location": "table#cost#qdrant",
+      "evidence_ids": [
+        "E11"
+      ]
+    },
+    {
+      "location": "table#cost#milvus",
+      "evidence_ids": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "location": "table#maturity#qdrant",
+      "evidence_ids": [
+        "E12",
+        "E13"
+      ]
+    },
+    {
+      "location": "table#maturity#milvus",
+      "evidence_ids": [
+        "E7"
+      ]
+    }
+  ],
+  "evidences": [
+    {
+      "evidence_id": "E1",
+      "source": {
+        "source_id": "S1",
+        "kind": "kb",
+        "title": "向量库公开基准快照（演示数据）",
+        "url": null,
+        "doc_id": "kb-vdb-bench",
+        "locator": "§5 基准",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "a19c6018451a91ca51b44d79b3e3e24d97b97867c91f4a9043e2a5433097391e",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；",
+      "quote": "VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；召回率@10 两者均 >0.95。结论要点：中小规模（千万以下）Qdrant 单机性价比高，亿级以上 Milvus 分布式吞吐占优。数字为演示快照，选型前请复测。",
+      "topic": "vector-db",
+      "object_name": "milvus",
+      "aspect": "performance",
+      "route": "kb",
+      "score": 16.213,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E2",
+      "source": {
+        "source_id": "S2",
+        "kind": "kb",
+        "title": "Milvus 性能架构（演示快照）",
+        "url": null,
+        "doc_id": "kb-milvus-perf",
+        "locator": "§1 架构与延迟",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "6d4757b0be2cb6feef414e5393aef4b2fe88ab2fd745f084e33005515395013b",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。",
+      "quote": "Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。2.4 版本引入 GPU 索引 CAGRA，官方基准显示 GPU 检索吞吐可比 CPU HNSW 高一个数量级。单机版（Milvus Lite/Standalone）延迟与 Qdrant 同量级，但分布式部署下元数据链路（etcd/Pulsar）会引入额外 P99 抖动。",
+      "topic": "vector-db",
+      "object_name": "milvus",
+      "aspect": "performance",
+      "route": "kb",
+      "score": 10.7807,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E3",
+      "source": {
+        "source_id": "S3",
+        "kind": "web",
+        "title": "Accelerating Milvus with NVIDIA CAGRA GPU Index",
+        "url": "https://milvus.io/blog/accelerate-milvus-with-cagra.md",
+        "doc_id": null,
+        "locator": "2024-06-12",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "bb79e1f16cb122ce8f18d30b0c0a896074e1fa6cd094e2989cd22c7cb33d9cf3",
+        "resolution": "retrieval_snapshot",
+        "url_reachable": null
+      },
+      "claim": "GPU 索引让亿级向量检索吞吐提升 10 倍量级。",
+      "quote": "Milvus 2.4 integrates NVIDIA CAGRA GPU index, achieving up to 10x throughput on billion-scale datasets vs CPU HNSW. 演示摘录：GPU 索引面向十亿级场景，小规模场景收益有限且需要 GPU 节点成本。",
+      "topic": "vector-db",
+      "object_name": "milvus",
+      "aspect": "performance",
+      "route": "web",
+      "score": 7.7538,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E4",
+      "source": {
+        "source_id": "S4",
+        "kind": "kb",
+        "title": "Milvus 生态与集成（演示快照）",
+        "url": null,
+        "doc_id": "kb-milvus-eco",
+        "locator": "§2 生态",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "46243f3e27210d36fdfbd7f0b60aa8c3372542666882168eec8dd8db1d1b8c7f",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。",
+      "quote": "Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。提供 pymilvus/Java/Go SDK，LangChain 与 LlamaIndex 亦有官方适配。附带可视化管理工具 Attu。生态文档覆盖云原生部署、混合检索（稀疏+稠密）等进阶场景。",
+      "topic": "vector-db",
+      "object_name": "milvus",
+      "aspect": "ecosystem",
+      "route": "kb",
+      "score": 2.6965,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E5",
+      "source": {
+        "source_id": "S5",
+        "kind": "kb",
+        "title": "Milvus 部署与成本（演示快照）",
+        "url": null,
+        "doc_id": "kb-milvus-cost",
+        "locator": "§3 成本",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "2104b35840f93443b2dc6dca27d570ce43eecd9aedc1594d4c119c4713e7f10f",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。",
+      "quote": "Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。Zilliz Cloud 提供托管版。自托管的人力与资源成本显著高于单二进制方案，但大规模（亿级以上）时单位存储成本有优势。",
+      "topic": "vector-db",
+      "object_name": "milvus",
+      "aspect": "cost",
+      "route": "kb",
+      "score": 2.4903,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E6",
+      "source": {
+        "source_id": "S6",
+        "kind": "web",
+        "title": "Zilliz Cloud Pricing",
+        "url": "https://zilliz.com/pricing",
+        "doc_id": null,
+        "locator": "2025-01-15",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "ae813ef8ebceb151b5d0f44696110c77004dc4537bf8816fd5ae0f6bac3709fa",
+        "resolution": "retrieval_snapshot",
+        "url_reachable": null
+      },
+      "claim": "托管 Milvus 按存储与 CU 计费，起步价高于自托管。",
+      "quote": "Zilliz Cloud serverless starts at a computed CU rate; dedicated clusters bill per node-hour. 演示摘录：托管方便但溢价明显，自托管要承担 etcd/对象存储/消息队列的运维。",
+      "topic": "vector-db",
+      "object_name": "milvus",
+      "aspect": "cost",
+      "route": "web",
+      "score": 1.2745,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E7",
+      "source": {
+        "source_id": "S7",
+        "kind": "kb",
+        "title": "Milvus 成熟度（演示快照）",
+        "url": null,
+        "doc_id": "kb-milvus-maturity",
+        "locator": "§4 成熟度",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "a93831b370a93056026210f7166a588098f2479531470db04c6f458561b90292",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。",
+      "quote": "Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。版本迭代快，2.x 系列小版本间配置兼容性问题在社区 issue 中有记录。社区规模与商业支持（Zilliz）在国内可及性好。",
+      "topic": "vector-db",
+      "object_name": "milvus",
+      "aspect": "maturity",
+      "route": "kb",
+      "score": 17.9731,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E8",
+      "source": {
+        "source_id": "S8",
+        "kind": "web",
+        "title": "Qdrant Documentation - Distributed Deployment",
+        "url": "https://qdrant.tech/documentation/guides/distributed_deployment/",
+        "doc_id": null,
+        "locator": "2025-03-01",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "2138445bb2435c87deaf257698576007de82ee2539ea5f124b3d4779528b1ee4",
+        "resolution": "retrieval_snapshot",
+        "url_reachable": null
+      },
+      "claim": "Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。",
+      "quote": "Qdrant supports sharding and replication. A single node handles up to tens of millions of vectors with HNSW; latency P99 stays under 10ms on commodity hardware. 演示摘录：单机千万级、P99<10ms。",
+      "topic": "vector-db",
+      "object_name": "qdrant",
+      "aspect": "performance",
+      "route": "web",
+      "score": 8.4178,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E9",
+      "source": {
+        "source_id": "S9",
+        "kind": "kb",
+        "title": "Qdrant 性能架构（演示快照）",
+        "url": null,
+        "doc_id": "kb-qdrant-perf",
+        "locator": "§1 架构与延迟",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "72485bb8de94905996afe3f27b15ea1eafc8589f0ec9a0afb27bc99071845bc1",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。",
+      "quote": "Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。支持标量量化（int8）与二进制量化，官方基准显示量化后内存可降至原始的 25%-4%，召回率损失可控在 1%-3%。",
+      "topic": "vector-db",
+      "object_name": "qdrant",
+      "aspect": "performance",
+      "route": "kb",
+      "score": 6.1674,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E10",
+      "source": {
+        "source_id": "S10",
+        "kind": "kb",
+        "title": "Qdrant 生态与集成（演示快照）",
+        "url": null,
+        "doc_id": "kb-qdrant-eco",
+        "locator": "§2 生态",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "550d0ee85946a17d22e7c4436247f049da46de986da42da6672d8a621ac0f8d9",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。",
+      "quote": "Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。社区版 GitHub Star 数超过 20k，Discord 社区活跃。不强制依赖其他中间件，单二进制即可运行，嵌入 Spring/K8s 环境阻力小。",
+      "topic": "vector-db",
+      "object_name": "qdrant",
+      "aspect": "ecosystem",
+      "route": "kb",
+      "score": 3.4369,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E11",
+      "source": {
+        "source_id": "S11",
+        "kind": "kb",
+        "title": "Qdrant 部署与成本（演示快照）",
+        "url": null,
+        "doc_id": "kb-qdrant-cost",
+        "locator": "§3 成本",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "ae58f8d5b2157cc7864f02a425981f75ef473f26fe7e9dac803300f410fed7d5",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。",
+      "quote": "Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。单二进制 + 无外部依赖，3 节点高可用集群最低可用 8GB 内存规格的虚拟机承载（百万级向量）。Qdrant Cloud 提供托管版，按 RAM 定价。自托管场景下运维组件仅 Qdrant 本身，无额外中间件成本。",
+      "topic": "vector-db",
+      "object_name": "qdrant",
+      "aspect": "cost",
+      "route": "kb",
+      "score": 5.7942,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E12",
+      "source": {
+        "source_id": "S12",
+        "kind": "kb",
+        "title": "Qdrant 成熟度（演示快照）",
+        "url": null,
+        "doc_id": "kb-qdrant-maturity",
+        "locator": "§4 成熟度",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "19d99fa111b17344d85e0223547b59e394359f6f72a2a62164b2152f89e43392",
+        "resolution": "kb_document",
+        "url_reachable": null
+      },
+      "claim": "Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。",
+      "quote": "Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。生产案例以中小规模 RAG 为主，公开案例多为千万级向量以下。背靠 Qdrant GmbH 商业公司，持续融资，长期维护风险较低。",
+      "topic": "vector-db",
+      "object_name": "qdrant",
+      "aspect": "maturity",
+      "route": "kb",
+      "score": 5.9032,
+      "attributes": {}
+    },
+    {
+      "evidence_id": "E13",
+      "source": {
+        "source_id": "S13",
+        "kind": "web",
+        "title": "Qdrant vs Milvus for a 10M-vector RAG app?",
+        "url": "https://www.reddit.com/r/vector_database/comments/selection_2025/",
+        "doc_id": null,
+        "locator": "2025-05-20",
+        "retrieved_at": "2026-10-28T19:28:38+00:00",
+        "content_hash": "922098825e161f45fffd50bc7ae58d5abeac09e72873307255273653c416c34c",
+        "resolution": "retrieval_snapshot",
+        "url_reachable": null
+      },
+      "claim": "社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。",
+      "quote": "Top comment: for under ~20M vectors a single Qdrant node is simpler to run; Milvus shines when you need horizontal scale, GPU index, or hybrid sparse-dense at billion scale. 演示摘录：规模阈值是主要分歧点。",
+      "topic": "vector-db",
+      "object_name": "qdrant",
+      "aspect": "maturity",
+      "route": "web",
+      "score": 2.7102,
+      "attributes": {}
+    }
+  ],
+  "evidence_disposition": [
+    {
+      "evidence_key": "kb:kb-vdb-bench:§5 基准",
+      "claim": "VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-vdb-bench §5 基准 (kb)",
+      "source_title": "向量库公开基准快照（演示数据）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-milvus-maturity:§4 成熟度",
+      "claim": "Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-milvus-maturity §4 成熟度 (kb)",
+      "source_title": "Milvus 成熟度（演示快照）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-milvus-perf:§1 架构与延迟",
+      "claim": "Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-milvus-perf §1 架构与延迟 (kb)",
+      "source_title": "Milvus 性能架构（演示快照）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-qdrant-perf:§1 架构与延迟",
+      "claim": "Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qdrant-perf §1 架构与延迟 (kb)",
+      "source_title": "Qdrant 性能架构（演示快照）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E9"
+    },
+    {
+      "evidence_key": "kb:kb-qdrant-maturity:§4 成熟度",
+      "claim": "Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qdrant-maturity §4 成熟度 (kb)",
+      "source_title": "Qdrant 成熟度（演示快照）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E12"
+    },
+    {
+      "evidence_key": "kb:kb-qdrant-cost:§3 成本",
+      "claim": "Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qdrant-cost §3 成本 (kb)",
+      "source_title": "Qdrant 部署与成本（演示快照）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E11"
+    },
+    {
+      "evidence_key": "kb:kb-qdrant-eco:§2 生态",
+      "claim": "Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qdrant-eco §2 生态 (kb)",
+      "source_title": "Qdrant 生态与集成（演示快照）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E10"
+    },
+    {
+      "evidence_key": "web:https://qdrant.tech/documentation/guides/distributed_deployment/:2025-03-01",
+      "claim": "Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。",
+      "source_kind": "web",
+      "source_ref": "https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)",
+      "source_title": "Qdrant Documentation - Distributed Deployment",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E8"
+    },
+    {
+      "evidence_key": "web:https://milvus.io/blog/accelerate-milvus-with-cagra.md:2024-06-12",
+      "claim": "GPU 索引让亿级向量检索吞吐提升 10 倍量级。",
+      "source_kind": "web",
+      "source_ref": "https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)",
+      "source_title": "Accelerating Milvus with NVIDIA CAGRA GPU Index",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "web:https://www.reddit.com/r/vector_database/comments/selection_2025/:2025-05-20",
+      "claim": "社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。",
+      "source_kind": "web",
+      "source_ref": "https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)",
+      "source_title": "Qdrant vs Milvus for a 10M-vector RAG app?",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E13"
+    },
+    {
+      "evidence_key": "kb:kb-milvus-maturity:§4 成熟度",
+      "claim": "Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-milvus-maturity §4 成熟度 (kb)",
+      "source_title": "Milvus 成熟度（演示快照）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E7"
+    },
+    {
+      "evidence_key": "kb:kb-vdb-bench:§5 基准",
+      "claim": "VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-vdb-bench §5 基准 (kb)",
+      "source_title": "向量库公开基准快照（演示数据）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E1"
+    },
+    {
+      "evidence_key": "kb:kb-milvus-perf:§1 架构与延迟",
+      "claim": "Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-milvus-perf §1 架构与延迟 (kb)",
+      "source_title": "Milvus 性能架构（演示快照）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E2"
+    },
+    {
+      "evidence_key": "kb:kb-qdrant-perf:§1 架构与延迟",
+      "claim": "Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qdrant-perf §1 架构与延迟 (kb)",
+      "source_title": "Qdrant 性能架构（演示快照）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-qdrant-maturity:§4 成熟度",
+      "claim": "Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qdrant-maturity §4 成熟度 (kb)",
+      "source_title": "Qdrant 成熟度（演示快照）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-qdrant-cost:§3 成本",
+      "claim": "Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qdrant-cost §3 成本 (kb)",
+      "source_title": "Qdrant 部署与成本（演示快照）",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-milvus-eco:§2 生态",
+      "claim": "Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-milvus-eco §2 生态 (kb)",
+      "source_title": "Milvus 生态与集成（演示快照）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E4"
+    },
+    {
+      "evidence_key": "kb:kb-milvus-cost:§3 成本",
+      "claim": "Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-milvus-cost §3 成本 (kb)",
+      "source_title": "Milvus 部署与成本（演示快照）",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E5"
+    },
+    {
+      "evidence_key": "web:https://milvus.io/blog/accelerate-milvus-with-cagra.md:2024-06-12",
+      "claim": "GPU 索引让亿级向量检索吞吐提升 10 倍量级。",
+      "source_kind": "web",
+      "source_ref": "https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)",
+      "source_title": "Accelerating Milvus with NVIDIA CAGRA GPU Index",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E3"
+    },
+    {
+      "evidence_key": "web:https://qdrant.tech/documentation/guides/distributed_deployment/:2025-03-01",
+      "claim": "Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。",
+      "source_kind": "web",
+      "source_ref": "https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)",
+      "source_title": "Qdrant Documentation - Distributed Deployment",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "web:https://www.reddit.com/r/vector_database/comments/selection_2025/:2025-05-20",
+      "claim": "社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。",
+      "source_kind": "web",
+      "source_ref": "https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)",
+      "source_title": "Qdrant vs Milvus for a 10M-vector RAG app?",
+      "status": "excluded",
+      "reason": "duplicate_source",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "web:https://zilliz.com/pricing:2025-01-15",
+      "claim": "托管 Milvus 按存储与 CU 计费，起步价高于自托管。",
+      "source_kind": "web",
+      "source_ref": "https://zilliz.com/pricing 2025-01-15 (web)",
+      "source_title": "Zilliz Cloud Pricing",
+      "status": "adopted",
+      "reason": "",
+      "evidence_id": "E6"
+    }
+  ],
+  "constraints": [],
+  "constraint_summary": {
+    "verdict": "not_checked",
+    "recommended_objects": [],
+    "excluded": {},
+    "unknown_objects": [],
+    "findings": [],
+    "gaps": [],
+    "checked_objects": []
+  },
+  "guard_audit": {
+    "ran": false,
+    "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：RAG 系统的向量库选 Qdrant 还是 Milvus？\n\n## 结论摘要\n\n**Qdrant**：性能：Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8]；生态：Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10]；成本：Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11]；成熟度：Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12]。\n\n**Milvus**：性能：VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1]；生态：Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4]；成本：Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5]；成熟度：Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7]。\n\n## 分维度对比\n\n| 维度 | Qdrant | Milvus |\n|---|---|---|\n| 性能 | Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8] | VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1] |\n| 生态 | Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10] | Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4] |\n| 成本 | Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11] | Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5] |\n| 成熟度 | Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12] | Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7] |\n\n## 证据明细\n\n- **[E1]** VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；（来源 [S1]：doc:kb-vdb-bench §5 基准 (kb)）\n- **[E2]** Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。（来源 [S2]：doc:kb-milvus-perf §1 架构与延迟 (kb)）\n- **[E3]** GPU 索引让亿级向量检索吞吐提升 10 倍量级。（来源 [S3]：https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)）\n- **[E4]** Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。（来源 [S4]：doc:kb-milvus-eco §2 生态 (kb)）\n- **[E5]** Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。（来源 [S5]：doc:kb-milvus-cost §3 成本 (kb)）\n- **[E6]** 托管 Milvus 按存储与 CU 计费，起步价高于自托管。（来源 [S6]：https://zilliz.com/pricing 2025-01-15 (web)）\n- **[E7]** Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。（来源 [S7]：doc:kb-milvus-maturity §4 成熟度 (kb)）\n- **[E8]** Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。（来源 [S8]：https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)）\n- **[E9]** Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。（来源 [S9]：doc:kb-qdrant-perf §1 架构与延迟 (kb)）\n- **[E10]** Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。（来源 [S10]：doc:kb-qdrant-eco §2 生态 (kb)）\n- **[E11]** Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。（来源 [S11]：doc:kb-qdrant-cost §3 成本 (kb)）\n- **[E12]** Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。（来源 [S12]：doc:kb-qdrant-maturity §4 成熟度 (kb)）\n- **[E13]** 社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。（来源 [S13]：https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** 向量库公开基准快照（演示数据） — doc:kb-vdb-bench §5 基准 (kb)\n- **[S2]** Milvus 性能架构（演示快照） — doc:kb-milvus-perf §1 架构与延迟 (kb)\n- **[S3]** Accelerating Milvus with NVIDIA CAGRA GPU Index — https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)\n- **[S4]** Milvus 生态与集成（演示快照） — doc:kb-milvus-eco §2 生态 (kb)\n- **[S5]** Milvus 部署与成本（演示快照） — doc:kb-milvus-cost §3 成本 (kb)\n- **[S6]** Zilliz Cloud Pricing — https://zilliz.com/pricing 2025-01-15 (web)\n- **[S7]** Milvus 成熟度（演示快照） — doc:kb-milvus-maturity §4 成熟度 (kb)\n- **[S8]** Qdrant Documentation - Distributed Deployment — https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)\n- **[S9]** Qdrant 性能架构（演示快照） — doc:kb-qdrant-perf §1 架构与延迟 (kb)\n- **[S10]** Qdrant 生态与集成（演示快照） — doc:kb-qdrant-eco §2 生态 (kb)\n- **[S11]** Qdrant 部署与成本（演示快照） — doc:kb-qdrant-cost §3 成本 (kb)\n- **[S12]** Qdrant 成熟度（演示快照） — doc:kb-qdrant-maturity §4 成熟度 (kb)\n- **[S13]** Qdrant vs Milvus for a 10M-vector RAG app? — https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)\n",
+    "final_markdown": "# 技术选型研究报告\n\n> 研究问题：RAG 系统的向量库选 Qdrant 还是 Milvus？\n\n## 结论摘要\n\n**Qdrant**：性能：Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8]；生态：Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10]；成本：Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11]；成熟度：Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12]。\n\n**Milvus**：性能：VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1]；生态：Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4]；成本：Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5]；成熟度：Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7]。\n\n## 分维度对比\n\n| 维度 | Qdrant | Milvus |\n|---|---|---|\n| 性能 | Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8] | VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1] |\n| 生态 | Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10] | Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4] |\n| 成本 | Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11] | Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5] |\n| 成熟度 | Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12] | Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7] |\n\n## 证据明细\n\n- **[E1]** VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；（来源 [S1]：doc:kb-vdb-bench §5 基准 (kb)）\n- **[E2]** Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。（来源 [S2]：doc:kb-milvus-perf §1 架构与延迟 (kb)）\n- **[E3]** GPU 索引让亿级向量检索吞吐提升 10 倍量级。（来源 [S3]：https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)）\n- **[E4]** Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。（来源 [S4]：doc:kb-milvus-eco §2 生态 (kb)）\n- **[E5]** Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。（来源 [S5]：doc:kb-milvus-cost §3 成本 (kb)）\n- **[E6]** 托管 Milvus 按存储与 CU 计费，起步价高于自托管。（来源 [S6]：https://zilliz.com/pricing 2025-01-15 (web)）\n- **[E7]** Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。（来源 [S7]：doc:kb-milvus-maturity §4 成熟度 (kb)）\n- **[E8]** Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。（来源 [S8]：https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)）\n- **[E9]** Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。（来源 [S9]：doc:kb-qdrant-perf §1 架构与延迟 (kb)）\n- **[E10]** Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。（来源 [S10]：doc:kb-qdrant-eco §2 生态 (kb)）\n- **[E11]** Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。（来源 [S11]：doc:kb-qdrant-cost §3 成本 (kb)）\n- **[E12]** Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。（来源 [S12]：doc:kb-qdrant-maturity §4 成熟度 (kb)）\n- **[E13]** 社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。（来源 [S13]：https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** 向量库公开基准快照（演示数据） — doc:kb-vdb-bench §5 基准 (kb)\n- **[S2]** Milvus 性能架构（演示快照） — doc:kb-milvus-perf §1 架构与延迟 (kb)\n- **[S3]** Accelerating Milvus with NVIDIA CAGRA GPU Index — https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)\n- **[S4]** Milvus 生态与集成（演示快照） — doc:kb-milvus-eco §2 生态 (kb)\n- **[S5]** Milvus 部署与成本（演示快照） — doc:kb-milvus-cost §3 成本 (kb)\n- **[S6]** Zilliz Cloud Pricing — https://zilliz.com/pricing 2025-01-15 (web)\n- **[S7]** Milvus 成熟度（演示快照） — doc:kb-milvus-maturity §4 成熟度 (kb)\n- **[S8]** Qdrant Documentation - Distributed Deployment — https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)\n- **[S9]** Qdrant 性能架构（演示快照） — doc:kb-qdrant-perf §1 架构与延迟 (kb)\n- **[S10]** Qdrant 生态与集成（演示快照） — doc:kb-qdrant-eco §2 生态 (kb)\n- **[S11]** Qdrant 部署与成本（演示快照） — doc:kb-qdrant-cost §3 成本 (kb)\n- **[S12]** Qdrant 成熟度（演示快照） — doc:kb-qdrant-maturity §4 成熟度 (kb)\n- **[S13]** Qdrant vs Milvus for a 10M-vector RAG app? — https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)\n",
+    "diff": "",
+    "invalid_citation_ids": [],
+    "rewrite_attempted": false,
+    "rewrite_accepted": null,
+    "rewrite_rejected_reason": null,
+    "claims_checked": 0,
+    "claims_quarantined": 0,
+    "actions": [
+      {
+        "action": "not_run",
+        "detail": "离线模板合成，无模型引用需要校验"
+      }
+    ],
+    "unverified_claims": [],
+    "fallback_used": false,
+    "fail_closed": false
+  },
+  "unverified_claims": [],
+  "meta": {
+    "routes_used": [
+      "kb",
+      "web"
+    ],
+    "routes_attempted": [
+      "kb",
+      "web"
+    ],
+    "degraded": false,
+    "plan_rounds": 1,
+    "step_count": 4,
+    "token_usage": 0,
+    "information_gaps": []
+  }
+}

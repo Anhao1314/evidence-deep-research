@@ -1,0 +1,1301 @@
+{
+  "schema_version": "1.0",
+  "report_type": "offline_structural",
+  "disclaimer": "本报告是离线结构回归，不是在线效果评测：使用启发式规划器与内置演示语料，不调用真实模型或搜索 API，不度量事实正确率或引用语义支撑率。",
+  "generated_at": "2026-10-28T19:28:37+00:00",
+  "git_commit": "f482c387924b39b164beb2a15b46d37a4b83293a",
+  "git_dirty": true,
+  "source_manifest": {
+    "schema_version": "1.0",
+    "git_commit": "f482c387924b39b164beb2a15b46d37a4b83293a",
+    "git_dirty": true,
+    "tracked_diff_sha256": "102a342db15fdbc2acc310a2bde23f6f1d4f1a37cd9055a2dd201370fa5a8c7f",
+    "tracked_diff_bytes": 130095,
+    "changed_paths": [
+      ".env.example",
+      ".github/workflows/ci.yml",
+      ".gitignore",
+      "README.md",
+      "app/agents/base.py",
+      "app/agents/rag_agent.py",
+      "app/agents/web_agent.py",
+      "app/config.py",
+      "app/domain_registry.py",
+      "app/graph/factory.py",
+      "app/graph/nodes.py",
+      "app/graph/state.py",
+      "app/llm/base.py",
+      "app/llm/heuristic.py",
+      "app/llm/openai_compat.py",
+      "app/llm/resilient.py",
+      "app/mcp_client/client.py",
+      "app/report/__init__.py",
+      "app/report/citation_guard.py",
+      "app/report/synth.py",
+      "app/schema/evidence.py",
+      "app/schema/plan.py",
+      "app/schema/report.py",
+      "app/tools/kb_client.py",
+      "app/tools/search.py",
+      "docs/adr/ADR-005-citation-guard.md",
+      "eval/assertions.py",
+      "eval/run_eval.py",
+      "knowledge_base/corpus.py",
+      "mcp_server/server.py",
+      "tests/test_resilient.py",
+      "tests/test_trace.py"
+    ],
+    "untracked_source_files": [
+      {
+        "path": "app/constraints.py",
+        "sha256": "0d32cf237f20689f5fa0f6b2fb68285080c03c86227e4fce9dac1506e7942083"
+      },
+      {
+        "path": "app/schema/constraints.py",
+        "sha256": "ae6e0da8de79d6646a0c6d7dbefdf84b4040a437e4e541adadc82d9d84fbcc1c"
+      },
+      {
+        "path": "app/schema/guard.py",
+        "sha256": "1b47838cafa3ffcdba8caaf7136fea177351e7a969837c52a1e0da17c6286d3c"
+      },
+      {
+        "path": "data/fixtures/constraint_selection/corpus.jsonl",
+        "sha256": "36cfdb3bd76544f93131f76f4d7f472e7b72eb190e18f7fe3c453367af6d2c3f"
+      },
+      {
+        "path": "data/fixtures/constraint_selection/web/web_demo.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "docs/demo-script.md",
+        "sha256": "c29b3be00b1dd895dd43b21af54dec0e609818b004cb193b58a74447a385a64e"
+      },
+      {
+        "path": "docs/evaluation.md",
+        "sha256": "d081b494ac39d11e0946f69f58e42ef381d4e734cd167dd66d205647e0d86ca8"
+      },
+      {
+        "path": "eval/annotation.py",
+        "sha256": "d09e5894068da4611745a64901176614ccf319d449d7925bfedc07882d4e999c"
+      },
+      {
+        "path": "eval/fixtures/constraint_tasks.v1.json",
+        "sha256": "019e47542ae058e0992324f41e17b932e908d0e48fe76a73881e099ad63627b2"
+      },
+      {
+        "path": "eval/fixtures/relevance_labels.v1.json",
+        "sha256": "96b72ad74e2dd00287097d07289bc6424eae5c8d2db7d40f84621424a63c878b"
+      },
+      {
+        "path": "eval/metrics.py",
+        "sha256": "9732a96381199f91c6163cf8ce0a54692d3144b9b549e315887c3eed3c9b4f3d"
+      },
+      {
+        "path": "eval/online_runner.py",
+        "sha256": "e3dc505ff6834743b54914e526fae8fe52e64200b1fa2ced0aa9e64ed38a4b9e"
+      },
+      {
+        "path": "eval/provenance.py",
+        "sha256": "1d546efd1c486dbef46c61e9f6ce213463c84c6c01dd8f9002181e5327b6313f"
+      },
+      {
+        "path": "eval/run_constraint_fixture.py",
+        "sha256": "e3ee93932df6ba1f404ca91d6c4d9bee37ae0e33b994152afbafdc779a7fe1f7"
+      },
+      {
+        "path": "eval/run_offline_suite.py",
+        "sha256": "46f85785896042bdbaba8e9ff3aff66fbc453d54c4cbade8834dd48bb8f52c69"
+      },
+      {
+        "path": "eval/task_suite.py",
+        "sha256": "c0750e517cbe6ed4e03559e4e65bd15b73c026741cebdfc0e1be978d917bb275"
+      },
+      {
+        "path": "eval/tasks/research_tasks.v1.json",
+        "sha256": "6a37b65b407830f864a7281b09ec036c87ef9e3a3ae2a69a783d305b5a47c97b"
+      },
+      {
+        "path": "eval/tasks/research_tasks.v1.web-only.json",
+        "sha256": "5a46346527b6c8cf066fd7df9b5a05594e9bd2def434bf80ca92ee5589e2e7eb"
+      },
+      {
+        "path": "scripts/capture_demo.py",
+        "sha256": "a266ebf0b0fd62f15762e4d52f79983fb16b521e45af903ca2cec5a1d3767b90"
+      },
+      {
+        "path": "tests/test_annotation.py",
+        "sha256": "cfdee8efee599ebab1ee5f8e5454c986525a72ceeaccb90f2ff32ecae5df9406"
+      },
+      {
+        "path": "tests/test_citation_guard.py",
+        "sha256": "36b0f7c502ae87ef8d5c675a3f6a824698e1b1df5a402041c41de284301aa4c1"
+      },
+      {
+        "path": "tests/test_constraint_fixture.py",
+        "sha256": "58da123a195cf735e406414b489eaf546f210051af432edd312b381bfcdff445"
+      },
+      {
+        "path": "tests/test_constraints.py",
+        "sha256": "9bc878b9c953a76e3a4c14c4f9fa585e06e4d6e251cabc55791c7e3b1c2d6185"
+      },
+      {
+        "path": "tests/test_eval_metrics.py",
+        "sha256": "bbe32435e5a4343c264e797c5f281a174deb1ba4ff0efdc2856ef102bd1abc94"
+      },
+      {
+        "path": "tests/test_online_prompt.py",
+        "sha256": "ef3efa0b57b97a2762e862de545789f329c3a939906f9021a0c075a0e3cccc77"
+      },
+      {
+        "path": "tests/test_online_runner.py",
+        "sha256": "aa30cf4b071dc139fae1cbac2e5e54378067e6d4de6c6d4cae43bf874a4d2ebd"
+      },
+      {
+        "path": "tests/test_provenance.py",
+        "sha256": "7c78eb1c566e61c0ffacafbfe1c477921a50ce0766070aef56f7238e9a2a008b"
+      },
+      {
+        "path": "tests/test_relevance_fixture.py",
+        "sha256": "73f54bc2d1e81091480b29f4e6ff5c4e91d0c04e383c34e4619befc2e8aa8ec3"
+      },
+      {
+        "path": "tests/test_replan_deterministic.py",
+        "sha256": "b451ffde3e2e1c8abb0e80aa047056d363a0ecbe0253616af1665a213f435531"
+      },
+      {
+        "path": "tests/test_task_suite.py",
+        "sha256": "035ac13d0e700fa1c32151f4c53abf79169ec162e2118bb6bb3e3f82a2ad8700"
+      }
+    ],
+    "untracked_source_count": 30,
+    "source_tree_fingerprint": "7a22bef99f3005bdf6e4c88d41e737391c00d930579aa714bf1485ab0737e97c",
+    "note": "不 commit 场景下的源码指纹；diff 与未跟踪源码文件哈希共同决定。"
+  },
+  "suite": {
+    "path": "eval/tasks/research_tasks.v1.json",
+    "suite_id": "research-tasks-v1",
+    "version": "1.0.0",
+    "sha256": "6a37b65b407830f864a7281b09ec036c87ef9e3a3ae2a69a783d305b5a47c97b",
+    "selected_cases": 10,
+    "offline_eligible_total": 10,
+    "suite_total": 20,
+    "included_online_only": false
+  },
+  "totals": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0
+  },
+  "cases": [
+    {
+      "case_id": "vdb-qdrant-vs-milvus-50m",
+      "category": "multi_object",
+      "question": "我们的 RAG 系统有 5000 万条 768 维向量，团队 5 人、自托管，Qdrant 和 Milvus 应该选哪个？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 ['kb', 'web']，期望至少 ['kb', 'web']"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 13，下限 10"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 29 处全部可回溯"
+        },
+        {
+          "name": "has_citations",
+          "passed": true,
+          "detail": "引用出现 29 次"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 1.00，下限 0.9"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 13/13，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 ['Qdrant', 'Milvus'] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "dimension_coverage",
+          "passed": true,
+          "detail": "实际 1.00，下限 1.0，维度 ['performance', 'ecosystem', 'cost', 'maturity']，对象 ['qdrant', 'milvus']"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-vdb-qdrant-vs-milvus-50m",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 13,
+      "citation_coverage": 1.0,
+      "pre_guard_citation_total": 29,
+      "pre_guard_citation_valid": 29,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": 1.0,
+      "post_guard_citation_total": 29,
+      "post_guard_citation_valid": 29,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": 1.0,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": 1.0,
+      "source_reference_integrity_rate": 1.0,
+      "source_resolution": {
+        "evidence_total": 13,
+        "evidence_resolved": 13,
+        "source_reference_integrity_rate": 1.0,
+        "source_total": 13,
+        "source_resolved": 13,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "agent-langgraph-vs-custom",
+      "category": "multi_object",
+      "question": "三人团队做多步 Agent 编排，选 LangGraph 还是自研状态机？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 ['kb', 'web']，期望至少 ['kb', 'web']"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 12，下限 10"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 28 处全部可回溯"
+        },
+        {
+          "name": "has_citations",
+          "passed": true,
+          "detail": "引用出现 28 次"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 1.00，下限 0.9"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 12/12，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 ['LangGraph', '自研编排'] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "dimension_coverage",
+          "passed": true,
+          "detail": "实际 1.00，下限 1.0，维度 ['performance', 'ecosystem', 'cost', 'maturity']，对象 ['langgraph', 'custom']"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-agent-langgraph-vs-custom",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 12,
+      "citation_coverage": 1.0,
+      "pre_guard_citation_total": 28,
+      "pre_guard_citation_valid": 28,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": 1.0,
+      "post_guard_citation_total": 28,
+      "post_guard_citation_valid": 28,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": 1.0,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": 1.0,
+      "source_reference_integrity_rate": 1.0,
+      "source_resolution": {
+        "evidence_total": 12,
+        "evidence_resolved": 12,
+        "source_reference_integrity_rate": 1.0,
+        "source_total": 12,
+        "source_resolved": 12,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "llm-deepseek-vs-qwen",
+      "category": "multi_object",
+      "question": "中文客服场景的大模型 API，DeepSeek 和 Qwen 怎么选？重点看成本、限流和中文效果。",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 ['kb', 'web']，期望至少 ['kb', 'web']"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 12，下限 10"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 28 处全部可回溯"
+        },
+        {
+          "name": "has_citations",
+          "passed": true,
+          "detail": "引用出现 28 次"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 1.00，下限 0.9"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 12/12，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 ['DeepSeek', 'Qwen'] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "dimension_coverage",
+          "passed": true,
+          "detail": "实际 1.00，下限 1.0，维度 ['performance', 'ecosystem', 'cost', 'maturity']，对象 ['deepseek', 'qwen']"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-llm-deepseek-vs-qwen",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 12,
+      "citation_coverage": 1.0,
+      "pre_guard_citation_total": 28,
+      "pre_guard_citation_valid": 28,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": 1.0,
+      "post_guard_citation_total": 28,
+      "post_guard_citation_valid": 28,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": 1.0,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": 1.0,
+      "source_reference_integrity_rate": 1.0,
+      "source_resolution": {
+        "evidence_total": 12,
+        "evidence_resolved": 12,
+        "source_reference_integrity_rate": 1.0,
+        "source_total": 12,
+        "source_resolved": 12,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "qdrant-prod-readiness",
+      "category": "single_object",
+      "question": "Qdrant 能支撑我们 5000 万向量、99.9% 可用性的生产要求吗？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 ['kb', 'web']，期望至少 ['kb', 'web']"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 10，下限 8"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 22 处全部可回溯"
+        },
+        {
+          "name": "has_citations",
+          "passed": true,
+          "detail": "引用出现 22 次"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 1.00，下限 0.9"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 10/10，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 ['Qdrant'] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "dimension_coverage",
+          "passed": true,
+          "detail": "实际 1.00，下限 1.0，维度 ['performance', 'ecosystem', 'cost', 'maturity']，对象 ['qdrant']"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-qdrant-prod-readiness",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 10,
+      "citation_coverage": 1.0,
+      "pre_guard_citation_total": 22,
+      "pre_guard_citation_valid": 22,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": 1.0,
+      "post_guard_citation_total": 22,
+      "post_guard_citation_valid": 22,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": 1.0,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": 1.0,
+      "source_reference_integrity_rate": 1.0,
+      "source_resolution": {
+        "evidence_total": 10,
+        "evidence_resolved": 10,
+        "source_reference_integrity_rate": 1.0,
+        "source_total": 10,
+        "source_resolved": 10,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "milvus-ops-burden",
+      "category": "single_object",
+      "question": "Milvus 最小生产集群需要哪些外部依赖，5 人团队运维负担大吗？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 ['kb', 'web']，期望至少 ['kb', 'web']"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 12，下限 8"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 26 处全部可回溯"
+        },
+        {
+          "name": "has_citations",
+          "passed": true,
+          "detail": "引用出现 26 次"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 1.00，下限 0.9"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 12/12，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 ['Milvus'] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "dimension_coverage",
+          "passed": true,
+          "detail": "实际 1.00，下限 1.0，维度 ['performance', 'ecosystem', 'cost', 'maturity']，对象 ['milvus']"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-milvus-ops-burden",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 12,
+      "citation_coverage": 1.0,
+      "pre_guard_citation_total": 26,
+      "pre_guard_citation_valid": 26,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": 1.0,
+      "post_guard_citation_total": 26,
+      "post_guard_citation_valid": 26,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": 1.0,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": 1.0,
+      "source_reference_integrity_rate": 1.0,
+      "source_resolution": {
+        "evidence_total": 12,
+        "evidence_resolved": 12,
+        "source_reference_integrity_rate": 1.0,
+        "source_total": 12,
+        "source_resolved": 12,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "langgraph-debug-experience",
+      "category": "single_object",
+      "question": "LangGraph 的学习曲线、可调试性和生产稳定性怎么样？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 ['kb', 'web']，期望至少 ['kb', 'web']"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 12，下限 9"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 28 处全部可回溯"
+        },
+        {
+          "name": "has_citations",
+          "passed": true,
+          "detail": "引用出现 28 次"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 1.00，下限 0.9"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 12/12，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 ['LangGraph'] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "dimension_coverage",
+          "passed": true,
+          "detail": "实际 1.00，下限 1.0，维度 ['performance', 'ecosystem', 'cost', 'maturity']，对象 ['langgraph']"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-langgraph-debug-experience",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 12,
+      "citation_coverage": 1.0,
+      "pre_guard_citation_total": 28,
+      "pre_guard_citation_valid": 28,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": 1.0,
+      "post_guard_citation_total": 28,
+      "post_guard_citation_valid": 28,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": 1.0,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": 1.0,
+      "source_reference_integrity_rate": 1.0,
+      "source_resolution": {
+        "evidence_total": 12,
+        "evidence_resolved": 12,
+        "source_reference_integrity_rate": 1.0,
+        "source_total": 12,
+        "source_resolved": 12,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "deepseek-rate-limit-sla",
+      "category": "single_object",
+      "question": "DeepSeek API 的限流、可用性和 SLA 能满足生产客服系统吗？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 ['kb', 'web']，期望至少 ['kb', 'web']"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 12，下限 9"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 28 处全部可回溯"
+        },
+        {
+          "name": "has_citations",
+          "passed": true,
+          "detail": "引用出现 28 次"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 1.00，下限 0.9"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 12/12，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 ['DeepSeek'] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "dimension_coverage",
+          "passed": true,
+          "detail": "实际 1.00，下限 1.0，维度 ['performance', 'ecosystem', 'cost', 'maturity']，对象 ['deepseek']"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-deepseek-rate-limit-sla",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 12,
+      "citation_coverage": 1.0,
+      "pre_guard_citation_total": 28,
+      "pre_guard_citation_valid": 28,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": 1.0,
+      "post_guard_citation_total": 28,
+      "post_guard_citation_valid": 28,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": 1.0,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": 1.0,
+      "source_reference_integrity_rate": 1.0,
+      "source_resolution": {
+        "evidence_total": 12,
+        "evidence_resolved": 12,
+        "source_reference_integrity_rate": 1.0,
+        "source_total": 12,
+        "source_resolved": 12,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "vague-vector-db-choice",
+      "category": "insufficient_info",
+      "question": "我们该用哪个向量数据库？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 ['kb', 'web']，期望至少 []"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 9，下限 0"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 22 处全部可回溯"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 1.00，下限 0.0"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 9/9，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 [] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "states_information_gaps",
+          "passed": true,
+          "detail": "声明 1 条缺口"
+        },
+        {
+          "name": "replan_or_gap",
+          "passed": true,
+          "detail": "计划轮数 1，缺口 1 条"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-vague-vector-db-choice",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 9,
+      "citation_coverage": 1.0,
+      "pre_guard_citation_total": 22,
+      "pre_guard_citation_valid": 22,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": 1.0,
+      "post_guard_citation_total": 22,
+      "post_guard_citation_valid": 22,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": 1.0,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": null,
+      "source_reference_integrity_rate": 1.0,
+      "source_resolution": {
+        "evidence_total": 9,
+        "evidence_resolved": 9,
+        "source_reference_integrity_rate": 1.0,
+        "source_total": 9,
+        "source_resolved": 9,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "ood-community-health",
+      "category": "insufficient_info",
+      "question": "怎么评估一个开源项目的社区健康度？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 []，期望至少 []"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 0，下限 0"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 0 处全部可回溯"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 0.00，下限 0.0"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 0/0，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 [] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "states_information_gaps",
+          "passed": true,
+          "detail": "声明 1 条缺口"
+        },
+        {
+          "name": "replan_or_gap",
+          "passed": true,
+          "detail": "计划轮数 1，缺口 1 条"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-ood-community-health",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 0,
+      "citation_coverage": null,
+      "pre_guard_citation_total": 0,
+      "pre_guard_citation_valid": 0,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": null,
+      "post_guard_citation_total": 0,
+      "post_guard_citation_valid": 0,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": null,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": null,
+      "source_reference_integrity_rate": null,
+      "source_resolution": {
+        "evidence_total": 0,
+        "evidence_resolved": 0,
+        "source_reference_integrity_rate": null,
+        "source_total": 0,
+        "source_resolved": 0,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    },
+    {
+      "case_id": "nonsense-best-tech",
+      "category": "insufficient_info",
+      "question": "最好的技术是什么？",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "must_converge",
+          "passed": true,
+          "detail": "报告已产出"
+        },
+        {
+          "name": "routes_used",
+          "passed": true,
+          "detail": "实际 []，期望至少 []"
+        },
+        {
+          "name": "min_evidences",
+          "passed": true,
+          "detail": "实际 0，下限 0"
+        },
+        {
+          "name": "no_fabricated_citations",
+          "passed": true,
+          "detail": "引用 0 处全部可回溯"
+        },
+        {
+          "name": "citation_coverage",
+          "passed": true,
+          "detail": "结论区域引用覆盖 0.00，下限 0.0"
+        },
+        {
+          "name": "source_reference_integrity",
+          "passed": true,
+          "detail": "解析 0/0，缺 content_hash 0，无定位 0，孤立 []"
+        },
+        {
+          "name": "objects_in_report",
+          "passed": true,
+          "detail": "对象 [] 全部出现"
+        },
+        {
+          "name": "unverified_claims_excluded",
+          "passed": true,
+          "detail": "隔离 0 条结论，主报告无泄漏"
+        },
+        {
+          "name": "states_information_gaps",
+          "passed": true,
+          "detail": "声明 1 条缺口"
+        },
+        {
+          "name": "replan_or_gap",
+          "passed": true,
+          "detail": "计划轮数 1，缺口 1 条"
+        },
+        {
+          "name": "plan_rounds_within_limit",
+          "passed": true,
+          "detail": "实际 1 轮，上限 2"
+        },
+        {
+          "name": "steps_within_limit",
+          "passed": true,
+          "detail": "实际 4 步，上限 32"
+        },
+        {
+          "name": "trace_complete",
+          "passed": true,
+          "detail": "trace 关键事件齐全"
+        }
+      ],
+      "report_id": "eval-nonsense-best-tech",
+      "plan_rounds": 1,
+      "step_count": 4,
+      "evidence_count": 0,
+      "citation_coverage": null,
+      "pre_guard_citation_total": 0,
+      "pre_guard_citation_valid": 0,
+      "pre_guard_citation_invalid": 0,
+      "pre_guard_citation_validity_rate": null,
+      "post_guard_citation_total": 0,
+      "post_guard_citation_valid": 0,
+      "post_guard_citation_invalid": 0,
+      "post_guard_citation_integrity_rate": null,
+      "guard_ran": false,
+      "guard_rewrite_attempted": false,
+      "guard_rewrite_accepted": null,
+      "guard_claims_checked": 0,
+      "guard_claims_quarantined": 0,
+      "guard_fallback_used": false,
+      "guard_fail_closed": false,
+      "dimension_coverage": null,
+      "source_reference_integrity_rate": null,
+      "source_resolution": {
+        "evidence_total": 0,
+        "evidence_resolved": 0,
+        "source_reference_integrity_rate": null,
+        "source_total": 0,
+        "source_resolved": 0,
+        "source_unresolved_ids": [],
+        "source_missing_content_hash": [],
+        "source_missing_locator": [],
+        "orphan_evidence_sources": [],
+        "url_reachable": {
+          "status": "NOT_MEASURED",
+          "reason": "评测不做网络探测；URL 可访问性不等于来源内容可回溯"
+        }
+      },
+      "offline_eligible": true
+    }
+  ]
+}

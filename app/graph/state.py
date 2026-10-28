@@ -9,7 +9,8 @@
 import operator
 from typing import Annotated, TypedDict
 
-from app.schema.evidence import Evidence
+from app.schema.constraints import Constraint, ConstraintSummary
+from app.schema.evidence import Evidence, EvidenceDisposition
 from app.schema.plan import Plan
 from app.schema.report import Report
 
@@ -39,6 +40,11 @@ class ResearchState(TypedDict, total=False):
     # merge 之后的最终证据（覆盖语义）
     evidences: list[Evidence]
     coverage: dict
+    evidence_disposition: list[EvidenceDisposition]
+
+    # 用户约束与核验（verify 写入，compose 消费）
+    constraints: list[Constraint]
+    constraint_summary: ConstraintSummary | None
 
     # verify 产物
     information_gaps: list[str]

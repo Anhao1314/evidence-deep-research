@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from app.schema.constraints import Constraint
+
 
 class SubTask(BaseModel):
     """一个可派发给子 Agent 的最小研究单元。"""
@@ -23,6 +25,9 @@ class Plan(BaseModel):
     plan_id: str
     subtasks: list[SubTask] = Field(default_factory=list)
     rationale: str = Field(default="", description="分解依据（离线=规则名，在线=模型自述）")
+    constraints: list[Constraint] = Field(
+        default_factory=list, description="从问题中抽取的用户约束；replan 时沿用"
+    )
 
     def signature(self) -> str:
         """计划指纹：用于重复计划检测（避免 replan 死循环）。"""

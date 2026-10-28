@@ -1,0 +1,67 @@
+{
+  "case_id": "insufficient",
+  "title": "信息不足：领域外问题",
+  "question": "怎么评估一个开源项目的社区健康度？",
+  "run_id": "demo-insufficient",
+  "fault_injection": null,
+  "constraint_check": null,
+  "controlled_fixture": null,
+  "fixture_note": null,
+  "kb_backend": "InProcessKBClient",
+  "report_id": "demo-insufficient",
+  "routes_used": [],
+  "routes_attempted": [
+    "kb",
+    "web"
+  ],
+  "degraded": false,
+  "plan_rounds": 1,
+  "step_count": 4,
+  "information_gaps": [
+    "问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。"
+  ],
+  "evidence_count": 0,
+  "source_count": 0,
+  "trace_event_count": 11,
+  "token_usage": 0,
+  "plan_event_count": 1,
+  "dispatch_event_count": 1,
+  "constraint_summary": {
+    "verdict": "not_checked",
+    "recommended_objects": [],
+    "excluded": {},
+    "unknown_objects": [],
+    "findings": [],
+    "gaps": [],
+    "checked_objects": []
+  },
+  "guard_audit": {
+    "ran": false,
+    "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：怎么评估一个开源项目的社区健康度？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- 问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。",
+    "final_markdown": "# 技术选型研究报告\n\n> 研究问题：怎么评估一个开源项目的社区健康度？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- 问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。",
+    "diff": "",
+    "invalid_citation_ids": [],
+    "rewrite_attempted": false,
+    "rewrite_accepted": null,
+    "rewrite_rejected_reason": null,
+    "claims_checked": 0,
+    "claims_quarantined": 0,
+    "actions": [
+      {
+        "action": "not_run",
+        "detail": "离线模板合成，无模型引用需要校验"
+      }
+    ],
+    "unverified_claims": [],
+    "fallback_used": false,
+    "fail_closed": false
+  },
+  "unverified_claims": [],
+  "evidence_disposition": {
+    "adopted": 0,
+    "excluded": 12,
+    "excluded_reasons": [
+      "unscoped_question"
+    ]
+  }
+}

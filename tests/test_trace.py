@@ -70,7 +70,7 @@ def test_tool_failure_emits_retry_and_degrade(settings, tmp_path):
         trace_store=trace_store,
     )
     run_id = "run-fail-1"
-    app.invoke(
+    final = app.invoke(
         {"question": "Qdrant 和 Milvus 哪个好？", "user_id": "t", "run_id": run_id},
         config={"recursion_limit": 128},
     )
@@ -84,3 +84,8 @@ def test_tool_failure_emits_retry_and_degrade(settings, tmp_path):
     assert verify_ev.payload["gaps"], "检索失败应转化为信息缺口"
     # degrade 不阻塞主图：报告仍然产出（synthesize/persist 存在）
     assert "synthesize" in types and "persist" in types
+    # 路线口径：失败路不算“已使用”，只算“已尝试”
+    report = final["report"]
+    assert report.meta.routes_used == []
+    assert report.meta.routes_attempted == ["kb", "web"]
+    assert report.meta.degraded is True

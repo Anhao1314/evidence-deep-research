@@ -1,0 +1,179 @@
+{
+  "report_id": "demo-insufficient",
+  "question": "怎么评估一个开源项目的社区健康度？",
+  "trace_id": "demo-insufficient",
+  "markdown": "# 技术选型研究报告\n\n> 研究问题：怎么评估一个开源项目的社区健康度？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- 问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。",
+  "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：怎么评估一个开源项目的社区健康度？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- 问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。",
+  "summary": "本轮检索未获得可用证据，无法给出有依据的结论。",
+  "sources": [],
+  "citations": [],
+  "evidences": [],
+  "evidence_disposition": [
+    {
+      "evidence_key": "kb:kb-milvus-maturity:§4 成熟度",
+      "claim": "Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-milvus-maturity §4 成熟度 (kb)",
+      "source_title": "Milvus 成熟度（演示快照）",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-langgraph-eco:§2 生态",
+      "claim": "LangGraph 与 LangChain 生态共享工具适配层（150+ 工具集成），LangSmith 提供商用级 trace 与评测闭环。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-langgraph-eco §2 生态 (kb)",
+      "source_title": "LangGraph 生态（演示快照）",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-custom-maturity:§4 成熟度",
+      "claim": "自研框架的成熟度等于团队自身工程水位，无外部社区兜底。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-custom-maturity §4 成熟度 (kb)",
+      "source_title": "自研编排的成熟度风险（演示快照）",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-milvus-eco:§2 生态",
+      "claim": "Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-milvus-eco §2 生态 (kb)",
+      "source_title": "Milvus 生态与集成（演示快照）",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-custom-eco:§2 生态",
+      "claim": "自研框架无现成工具适配层，每接入一个外部系统（搜索、数据库、MCP）都要写适配代码。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-custom-eco §2 生态 (kb)",
+      "source_title": "自研编排的生态负担（演示快照）",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-qwen-eco:§3 生态",
+      "claim": "Qwen 通过 DashScope 与百炼平台提供 OpenAI 兼容端点（compatible-mode/v1），LangChain/LangGraph 有官方集成文档。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qwen-eco §3 生态 (kb)",
+      "source_title": "Qwen 生态兼容（演示快照）",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-qdrant-eco:§2 生态",
+      "claim": "Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qdrant-eco §2 生态 (kb)",
+      "source_title": "Qdrant 生态与集成（演示快照）",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "kb:kb-qwen-maturity:§4 成熟度",
+      "claim": "Qwen 由阿里云提供企业级 SLA，服务稳定性记录良好，通过等保等国内合规认证，政企客户案例多。",
+      "source_kind": "kb",
+      "source_ref": "doc:kb-qwen-maturity §4 成熟度 (kb)",
+      "source_title": "Qwen 服务成熟度（演示快照）",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "web:https://news.ycombinator.com/item?id=custom-agent-postmortem:2025-02-10",
+      "claim": "团队一年后迁移到开源框架：自研的断点恢复与重试是最大的坑。",
+      "source_kind": "web",
+      "source_ref": "https://news.ycombinator.com/item?id=custom-agent-postmortem 2025-02-10 (web)",
+      "source_title": "We built our own agent orchestration - a postmortem",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "web:https://www.reddit.com/r/vector_database/comments/selection_2025/:2025-05-20",
+      "claim": "社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。",
+      "source_kind": "web",
+      "source_ref": "https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)",
+      "source_title": "Qdrant vs Milvus for a 10M-vector RAG app?",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "web:https://www.aliyun.com/legal/sla:2025-04-01",
+      "claim": "企业级 SLA 与国内合规认证齐全。",
+      "source_kind": "web",
+      "source_ref": "https://www.aliyun.com/legal/sla 2025-04-01 (web)",
+      "source_title": "阿里云计算型服务 SLA",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    },
+    {
+      "evidence_key": "web:https://langchain-ai.github.io/langgraph/concepts/multi_agent/:2025-08-01",
+      "claim": "Send API 支持 map-reduce 式动态并行派发子任务。",
+      "source_kind": "web",
+      "source_ref": "https://langchain-ai.github.io/langgraph/concepts/multi_agent/ 2025-08-01 (web)",
+      "source_title": "LangGraph Multi-Agent Concepts",
+      "status": "excluded",
+      "reason": "unscoped_question",
+      "evidence_id": null
+    }
+  ],
+  "constraints": [],
+  "constraint_summary": {
+    "verdict": "not_checked",
+    "recommended_objects": [],
+    "excluded": {},
+    "unknown_objects": [],
+    "findings": [],
+    "gaps": [],
+    "checked_objects": []
+  },
+  "guard_audit": {
+    "ran": false,
+    "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：怎么评估一个开源项目的社区健康度？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- 问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。",
+    "final_markdown": "# 技术选型研究报告\n\n> 研究问题：怎么评估一个开源项目的社区健康度？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- 问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。",
+    "diff": "",
+    "invalid_citation_ids": [],
+    "rewrite_attempted": false,
+    "rewrite_accepted": null,
+    "rewrite_rejected_reason": null,
+    "claims_checked": 0,
+    "claims_quarantined": 0,
+    "actions": [
+      {
+        "action": "not_run",
+        "detail": "离线模板合成，无模型引用需要校验"
+      }
+    ],
+    "unverified_claims": [],
+    "fallback_used": false,
+    "fail_closed": false
+  },
+  "unverified_claims": [],
+  "meta": {
+    "routes_used": [],
+    "routes_attempted": [
+      "kb",
+      "web"
+    ],
+    "degraded": false,
+    "plan_rounds": 1,
+    "step_count": 4,
+    "token_usage": 0,
+    "information_gaps": [
+      "问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。"
+    ]
+  }
+}

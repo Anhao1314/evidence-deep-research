@@ -1,0 +1,67 @@
+{
+  "case_id": "replan",
+  "title": "确定性 replan：首轮缺口到第二轮补充检索",
+  "question": "Atlas 向量数据库的性能、生态、成本和成熟度怎么样？",
+  "run_id": "demo-replan",
+  "fault_injection": null,
+  "constraint_check": null,
+  "controlled_fixture": true,
+  "fixture_note": "脚本化 KB 只返回部分维度；仅证明离线 replan 行为与 Trace，不代表在线 replan 质量。",
+  "kb_backend": "ScriptedKBClient（fixture）",
+  "report_id": "demo-replan",
+  "routes_used": [
+    "kb"
+  ],
+  "routes_attempted": [
+    "kb",
+    "web"
+  ],
+  "degraded": false,
+  "plan_rounds": 2,
+  "step_count": 7,
+  "information_gaps": [],
+  "evidence_count": 4,
+  "source_count": 4,
+  "trace_event_count": 23,
+  "token_usage": 0,
+  "plan_event_count": 2,
+  "dispatch_event_count": 2,
+  "constraint_summary": {
+    "verdict": "not_checked",
+    "recommended_objects": [],
+    "excluded": {},
+    "unknown_objects": [],
+    "findings": [],
+    "gaps": [],
+    "checked_objects": []
+  },
+  "guard_audit": {
+    "ran": false,
+    "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：Atlas 向量数据库的性能、生态、成本和成熟度怎么样？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n",
+    "final_markdown": "# 技术选型研究报告\n\n> 研究问题：Atlas 向量数据库的性能、生态、成本和成熟度怎么样？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n",
+    "diff": "",
+    "invalid_citation_ids": [],
+    "rewrite_attempted": false,
+    "rewrite_accepted": null,
+    "rewrite_rejected_reason": null,
+    "claims_checked": 0,
+    "claims_quarantined": 0,
+    "actions": [
+      {
+        "action": "not_run",
+        "detail": "离线模板合成，无模型引用需要校验"
+      }
+    ],
+    "unverified_claims": [],
+    "fallback_used": false,
+    "fail_closed": false
+  },
+  "unverified_claims": [],
+  "evidence_disposition": {
+    "adopted": 4,
+    "excluded": 4,
+    "excluded_reasons": [
+      "duplicate_source"
+    ]
+  }
+}

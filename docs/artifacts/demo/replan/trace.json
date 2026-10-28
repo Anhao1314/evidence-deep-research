@@ -1,0 +1,474 @@
+{
+  "trace_id": "demo-replan",
+  "event_count": 23,
+  "token_usage": 0,
+  "events": [
+    {
+      "seq": 1,
+      "ts": "2026-10-28T19:28:38.380+00:00",
+      "node": "load_context",
+      "event_type": "memory_recall",
+      "payload": {
+        "preferences": {},
+        "related_topics": 0,
+        "snippets": 0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 2,
+      "ts": "2026-10-28T19:28:38.380+00:00",
+      "node": "plan",
+      "event_type": "plan",
+      "payload": {
+        "plan_id": "plan-4668b339",
+        "subtasks": [
+          {
+            "subtask_id": "T8ae575",
+            "route": "kb",
+            "topic": "vector-db",
+            "object_name": "atlas",
+            "object_display": "Atlas",
+            "aspect": "general",
+            "query": "Atlas 向量数据库"
+          },
+          {
+            "subtask_id": "T8efd27",
+            "route": "web",
+            "topic": "vector-db",
+            "object_name": "atlas",
+            "object_display": "Atlas",
+            "aspect": "general",
+            "query": "Atlas 向量数据库"
+          }
+        ],
+        "rationale": "启发式规则：命中主题 vector-db，对象 ['atlas']",
+        "is_duplicate": false,
+        "round": 1,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 3,
+      "ts": "2026-10-28T19:28:38.381+00:00",
+      "node": "dispatch",
+      "event_type": "dispatch",
+      "payload": {
+        "fan_out": 2,
+        "targets": [
+          "rag_agent",
+          "web_agent"
+        ],
+        "subtask_ids": [
+          "T8ae575",
+          "T8efd27"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 4,
+      "ts": "2026-10-28T19:28:38.381+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "T8ae575",
+        "query": "Atlas 向量数据库",
+        "top_k": 8,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 5,
+      "ts": "2026-10-28T19:28:38.382+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "T8efd27",
+        "query": "Atlas 向量数据库",
+        "top_k": 4,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 6,
+      "ts": "2026-10-28T19:28:38.382+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "hits": 2,
+        "latency_ms": 0.01
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 7,
+      "ts": "2026-10-28T19:28:38.382+00:00",
+      "node": "web_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "hits": 0,
+        "latency_ms": 0.0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 8,
+      "ts": "2026-10-28T19:28:38.383+00:00",
+      "node": "merge",
+      "event_type": "merge",
+      "payload": {
+        "raw_evidences": 2,
+        "after_scope": 2,
+        "deduped": 2,
+        "after_budget_and_prefs": 2,
+        "excluded_by_reason": {},
+        "excluded": [],
+        "coverage": {
+          "vector-db/atlas": [
+            "cost",
+            "performance"
+          ]
+        }
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 9,
+      "ts": "2026-10-28T19:28:38.383+00:00",
+      "node": "verify",
+      "event_type": "verify",
+      "payload": {
+        "gaps": [
+          "Atlas 缺少维度证据：生态、成熟度"
+        ],
+        "replan": true,
+        "constraint_summary": {
+          "verdict": "not_checked",
+          "recommended_objects": [],
+          "excluded": {},
+          "unknown_objects": [],
+          "findings": [],
+          "gaps": [],
+          "checked_objects": []
+        }
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 10,
+      "ts": "2026-10-28T19:28:38.383+00:00",
+      "node": "plan",
+      "event_type": "plan",
+      "payload": {
+        "plan_id": "plan-518f160a",
+        "subtasks": [
+          {
+            "subtask_id": "T4ca4f5",
+            "route": "kb",
+            "topic": "vector-db",
+            "object_name": "atlas",
+            "object_display": "Atlas",
+            "aspect": "ecosystem",
+            "query": "Atlas 向量数据库 生态"
+          },
+          {
+            "subtask_id": "T5ae453",
+            "route": "web",
+            "topic": "vector-db",
+            "object_name": "atlas",
+            "object_display": "Atlas",
+            "aspect": "ecosystem",
+            "query": "Atlas 向量数据库 生态"
+          },
+          {
+            "subtask_id": "T3fceab",
+            "route": "kb",
+            "topic": "vector-db",
+            "object_name": "atlas",
+            "object_display": "Atlas",
+            "aspect": "maturity",
+            "query": "Atlas 向量数据库 成熟度"
+          },
+          {
+            "subtask_id": "T411f0c",
+            "route": "web",
+            "topic": "vector-db",
+            "object_name": "atlas",
+            "object_display": "Atlas",
+            "aspect": "maturity",
+            "query": "Atlas 向量数据库 成熟度"
+          }
+        ],
+        "rationale": "启发式规则：针对信息缺口的补充检索",
+        "is_duplicate": false,
+        "round": 2,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 11,
+      "ts": "2026-10-28T19:28:38.384+00:00",
+      "node": "dispatch",
+      "event_type": "dispatch",
+      "payload": {
+        "fan_out": 4,
+        "targets": [
+          "rag_agent",
+          "web_agent",
+          "rag_agent",
+          "web_agent"
+        ],
+        "subtask_ids": [
+          "T4ca4f5",
+          "T5ae453",
+          "T3fceab",
+          "T411f0c"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 12,
+      "ts": "2026-10-28T19:28:38.384+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "T4ca4f5",
+        "query": "Atlas 向量数据库 生态",
+        "top_k": 8,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 13,
+      "ts": "2026-10-28T19:28:38.385+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "T5ae453",
+        "query": "Atlas 向量数据库 生态",
+        "top_k": 4,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 14,
+      "ts": "2026-10-28T19:28:38.385+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "T3fceab",
+        "query": "Atlas 向量数据库 成熟度",
+        "top_k": 8,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 15,
+      "ts": "2026-10-28T19:28:38.385+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "T411f0c",
+        "query": "Atlas 向量数据库 成熟度",
+        "top_k": 4,
+        "constraints": []
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 16,
+      "ts": "2026-10-28T19:28:38.386+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "hits": 3,
+        "latency_ms": 0.01
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 17,
+      "ts": "2026-10-28T19:28:38.386+00:00",
+      "node": "web_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "hits": 0,
+        "latency_ms": 0.0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 18,
+      "ts": "2026-10-28T19:28:38.386+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "hits": 3,
+        "latency_ms": 0.0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 19,
+      "ts": "2026-10-28T19:28:38.387+00:00",
+      "node": "web_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "hits": 0,
+        "latency_ms": 0.0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 20,
+      "ts": "2026-10-28T19:28:38.387+00:00",
+      "node": "merge",
+      "event_type": "merge",
+      "payload": {
+        "raw_evidences": 8,
+        "after_scope": 8,
+        "deduped": 4,
+        "after_budget_and_prefs": 4,
+        "excluded_by_reason": {
+          "duplicate_source": 4
+        },
+        "excluded": [
+          {
+            "source_ref": "doc:fixture-atlas-perf §1 容量 (kb)",
+            "claim": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-cost §3 成本 (kb)",
+            "claim": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-perf §1 容量 (kb)",
+            "claim": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-cost §3 成本 (kb)",
+            "claim": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；",
+            "reason": "duplicate_source"
+          }
+        ],
+        "coverage": {
+          "vector-db/atlas": [
+            "cost",
+            "ecosystem",
+            "maturity",
+            "performance"
+          ]
+        }
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 21,
+      "ts": "2026-10-28T19:28:38.388+00:00",
+      "node": "verify",
+      "event_type": "verify",
+      "payload": {
+        "gaps": [],
+        "replan": false,
+        "constraint_summary": {
+          "verdict": "not_checked",
+          "recommended_objects": [],
+          "excluded": {},
+          "unknown_objects": [],
+          "findings": [],
+          "gaps": [],
+          "checked_objects": []
+        }
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 22,
+      "ts": "2026-10-28T19:28:38.388+00:00",
+      "node": "synthesize",
+      "event_type": "synthesize",
+      "payload": {
+        "markdown_chars": 998,
+        "citations": 1,
+        "evidences": 4,
+        "sources": 4,
+        "degraded": false,
+        "guard_ran": false,
+        "guard_quarantined": 0,
+        "guard_fallback": false,
+        "constraint_verdict": "not_checked"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 23,
+      "ts": "2026-10-28T19:28:38.388+00:00",
+      "node": "persist",
+      "event_type": "persist",
+      "payload": {
+        "topic_recorded": true,
+        "snippets": 4
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    }
+  ]
+}

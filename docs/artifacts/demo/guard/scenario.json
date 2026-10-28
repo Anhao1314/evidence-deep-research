@@ -1,0 +1,112 @@
+{
+  "case_id": "guard",
+  "title": "引用 Guard：隔离非法/无引用结论（受控模型输出）",
+  "question": "Qdrant 和 Milvus 怎么选？",
+  "run_id": "demo-guard",
+  "fault_injection": null,
+  "constraint_check": null,
+  "controlled_fixture": true,
+  "fixture_note": "模型输出由脚本固定注入，包含合法引用、非法引用、无引用事实性结论；用于验证 Guard 行为，不是在线模型效果。",
+  "kb_backend": "InProcessKBClient",
+  "report_id": "demo-guard",
+  "routes_used": [
+    "kb",
+    "web"
+  ],
+  "routes_attempted": [
+    "kb",
+    "web"
+  ],
+  "degraded": false,
+  "plan_rounds": 1,
+  "step_count": 4,
+  "information_gaps": [],
+  "evidence_count": 13,
+  "source_count": 13,
+  "trace_event_count": 16,
+  "token_usage": 0,
+  "plan_event_count": 1,
+  "dispatch_event_count": 1,
+  "constraint_summary": {
+    "verdict": "not_checked",
+    "recommended_objects": [],
+    "excluded": {},
+    "unknown_objects": [],
+    "findings": [],
+    "gaps": [],
+    "checked_objects": []
+  },
+  "guard_audit": {
+    "ran": true,
+    "raw_markdown": "# 技术选型研究报告（模型原始输出，受控 fixture）\n\n## 结论摘要\n\n根据证据 [E1]，该系统在千万级向量规模下有性能数据。\n\nMilvus 的 GPU 索引吞吐提升 10 倍 [E99]。\n\nQdrant 是最好的选择。\n",
+    "final_markdown": "# 技术选型研究报告（模型原始输出，受控 fixture）\n\n## 结论摘要\n\n根据证据 [E1]，该系统在千万级向量规模下有性能数据。\n",
+    "diff": "--- pre_guard\n+++ post_guard\n@@ -3,7 +3,3 @@\n ## 结论摘要\n \n 根据证据 [E1]，该系统在千万级向量规模下有性能数据。\n-\n-Milvus 的 GPU 索引吞吐提升 10 倍 [E99]。\n-\n-Qdrant 是最好的选择。",
+    "invalid_citation_ids": [
+      "E99"
+    ],
+    "rewrite_attempted": true,
+    "rewrite_accepted": false,
+    "rewrite_rejected_reason": "rewrite_still_invalid",
+    "claims_checked": 3,
+    "claims_quarantined": 2,
+    "actions": [
+      {
+        "action": "rewrite_rejected",
+        "detail": "rewrite_still_invalid"
+      },
+      {
+        "action": "claim_quarantined",
+        "detail": "隔离 2 条无法追溯的结论；未写入主报告"
+      }
+    ],
+    "unverified_claims": [
+      {
+        "location": "line#7",
+        "text": "Milvus 的 GPU 索引吞吐提升 10 倍 [E99]。",
+        "invalid_citation_ids": [
+          "E99"
+        ],
+        "valid_citation_ids": [],
+        "reason": "invalid_citation_after_rewrite",
+        "action": "quarantined"
+      },
+      {
+        "location": "line#9",
+        "text": "Qdrant 是最好的选择。",
+        "invalid_citation_ids": [],
+        "valid_citation_ids": [],
+        "reason": "missing_citation",
+        "action": "quarantined"
+      }
+    ],
+    "fallback_used": false,
+    "fail_closed": false
+  },
+  "unverified_claims": [
+    {
+      "location": "line#7",
+      "text": "Milvus 的 GPU 索引吞吐提升 10 倍 [E99]。",
+      "invalid_citation_ids": [
+        "E99"
+      ],
+      "valid_citation_ids": [],
+      "reason": "invalid_citation_after_rewrite",
+      "action": "quarantined"
+    },
+    {
+      "location": "line#9",
+      "text": "Qdrant 是最好的选择。",
+      "invalid_citation_ids": [],
+      "valid_citation_ids": [],
+      "reason": "missing_citation",
+      "action": "quarantined"
+    }
+  ],
+  "evidence_disposition": {
+    "adopted": 13,
+    "excluded": 9,
+    "excluded_reasons": [
+      "duplicate_source"
+    ]
+  }
+}

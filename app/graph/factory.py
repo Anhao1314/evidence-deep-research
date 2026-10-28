@@ -33,7 +33,7 @@ from app.graph.state import ResearchState
 from app.llm.base import LLMProvider
 from app.llm.heuristic import HeuristicProvider
 from app.memory.store import MemoryStore
-from app.tools.kb_client import InProcessKBClient, KBClient
+from app.tools.kb_client import EmptyKBClient, InProcessKBClient, KBClient
 from app.tools.search import DemoSearchProvider, SearchProvider
 from app.trace.store import TraceStore
 from knowledge_base.retriever import KBRetriever
@@ -97,6 +97,8 @@ def build_research_app(
 
 
 def _build_kb_client(settings: Settings, retriever: KBRetriever) -> KBClient:
+    if not settings.kb_enabled:
+        return EmptyKBClient()
     if settings.mcp_kb_enabled:
         from app.mcp_client.client import McpKBClient
 
@@ -124,6 +126,7 @@ def _build_llm_provider(settings: Settings, registry: DomainRegistry,
         api_key=settings.llm_api_key,
         model=settings.llm_model,
         registry=registry,
+        timeout=settings.llm_timeout,
         max_retries=settings.llm_max_retries,
         retry_base_delay=settings.llm_retry_base_delay,
         trace_store=trace_store,

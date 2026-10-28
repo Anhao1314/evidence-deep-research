@@ -1,0 +1,776 @@
+{
+  "trace_id": "demo-constraints",
+  "event_count": 19,
+  "token_usage": 0,
+  "events": [
+    {
+      "seq": 1,
+      "ts": "2026-10-28T19:28:38.363+00:00",
+      "node": "load_context",
+      "event_type": "memory_recall",
+      "payload": {
+        "preferences": {},
+        "related_topics": 0,
+        "snippets": 0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 2,
+      "ts": "2026-10-28T19:28:38.364+00:00",
+      "node": "plan",
+      "event_type": "plan",
+      "payload": {
+        "plan_id": "plan-4a98a803",
+        "subtasks": [
+          {
+            "subtask_id": "Tcc2b74",
+            "route": "kb",
+            "topic": "vector-db",
+            "object_name": "atlas",
+            "object_display": "Atlas",
+            "aspect": "general",
+            "query": "Atlas 向量数据库"
+          },
+          {
+            "subtask_id": "T19fbc3",
+            "route": "web",
+            "topic": "vector-db",
+            "object_name": "atlas",
+            "object_display": "Atlas",
+            "aspect": "general",
+            "query": "Atlas 向量数据库"
+          },
+          {
+            "subtask_id": "Tc4efac",
+            "route": "kb",
+            "topic": "vector-db",
+            "object_name": "helios",
+            "object_display": "Helios",
+            "aspect": "general",
+            "query": "Helios 向量数据库"
+          },
+          {
+            "subtask_id": "T9c2f47",
+            "route": "web",
+            "topic": "vector-db",
+            "object_name": "helios",
+            "object_display": "Helios",
+            "aspect": "general",
+            "query": "Helios 向量数据库"
+          },
+          {
+            "subtask_id": "T00bc4c",
+            "route": "kb",
+            "topic": "vector-db",
+            "object_name": "pgvector",
+            "object_display": "pgvector",
+            "aspect": "general",
+            "query": "pgvector 向量数据库"
+          },
+          {
+            "subtask_id": "Tde6907",
+            "route": "web",
+            "topic": "vector-db",
+            "object_name": "pgvector",
+            "object_display": "pgvector",
+            "aspect": "general",
+            "query": "pgvector 向量数据库"
+          }
+        ],
+        "rationale": "启发式规则：命中主题 vector-db，对象 ['atlas', 'helios', 'pgvector']",
+        "is_duplicate": false,
+        "round": 1,
+        "constraints": [
+          {
+            "constraint_id": "C1",
+            "kind": "scale",
+            "text": "500 万条 768 维向量",
+            "value": "5000000",
+            "unit": "vectors",
+            "source": "user"
+          },
+          {
+            "constraint_id": "C2",
+            "kind": "team",
+            "text": "5 人",
+            "value": "5",
+            "unit": "people",
+            "source": "user"
+          },
+          {
+            "constraint_id": "C3",
+            "kind": "cost",
+            "text": "低成本/预算有限",
+            "value": "low",
+            "unit": "tier",
+            "source": "user"
+          },
+          {
+            "constraint_id": "C4",
+            "kind": "deployment",
+            "text": "自托管",
+            "value": "self-hosted",
+            "unit": "",
+            "source": "user"
+          },
+          {
+            "constraint_id": "C5",
+            "kind": "stack",
+            "text": "不引入新数据库/中间件",
+            "value": "no_new_infra",
+            "unit": "policy",
+            "source": "user"
+          }
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 3,
+      "ts": "2026-10-28T19:28:38.364+00:00",
+      "node": "dispatch",
+      "event_type": "dispatch",
+      "payload": {
+        "fan_out": 6,
+        "targets": [
+          "rag_agent",
+          "web_agent",
+          "rag_agent",
+          "web_agent",
+          "rag_agent",
+          "web_agent"
+        ],
+        "subtask_ids": [
+          "Tcc2b74",
+          "T19fbc3",
+          "Tc4efac",
+          "T9c2f47",
+          "T00bc4c",
+          "Tde6907"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 4,
+      "ts": "2026-10-28T19:28:38.365+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "Tcc2b74",
+        "query": "Atlas 向量数据库",
+        "top_k": 20,
+        "constraints": [
+          "C1",
+          "C2",
+          "C3",
+          "C4",
+          "C5"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 5,
+      "ts": "2026-10-28T19:28:38.365+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "T19fbc3",
+        "query": "Atlas 向量数据库",
+        "top_k": 4,
+        "constraints": [
+          "C1",
+          "C2",
+          "C3",
+          "C4",
+          "C5"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 6,
+      "ts": "2026-10-28T19:28:38.366+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "Tc4efac",
+        "query": "Helios 向量数据库",
+        "top_k": 20,
+        "constraints": [
+          "C1",
+          "C2",
+          "C3",
+          "C4",
+          "C5"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 7,
+      "ts": "2026-10-28T19:28:38.366+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "hits": 12,
+        "latency_ms": 0.04
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 8,
+      "ts": "2026-10-28T19:28:38.368+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "T9c2f47",
+        "query": "Helios 向量数据库",
+        "top_k": 4,
+        "constraints": [
+          "C1",
+          "C2",
+          "C3",
+          "C4",
+          "C5"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 9,
+      "ts": "2026-10-28T19:28:38.368+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "subtask_id": "T00bc4c",
+        "query": "pgvector 向量数据库",
+        "top_k": 20,
+        "constraints": [
+          "C1",
+          "C2",
+          "C3",
+          "C4",
+          "C5"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 10,
+      "ts": "2026-10-28T19:28:38.368+00:00",
+      "node": "web_agent",
+      "event_type": "tool_call",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "subtask_id": "Tde6907",
+        "query": "pgvector 向量数据库",
+        "top_k": 4,
+        "constraints": [
+          "C1",
+          "C2",
+          "C3",
+          "C4",
+          "C5"
+        ]
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 11,
+      "ts": "2026-10-28T19:28:38.369+00:00",
+      "node": "web_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "hits": 0,
+        "latency_ms": 0.0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 12,
+      "ts": "2026-10-28T19:28:38.369+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "hits": 13,
+        "latency_ms": 0.03
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 13,
+      "ts": "2026-10-28T19:28:38.369+00:00",
+      "node": "web_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "hits": 0,
+        "latency_ms": 0.0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 14,
+      "ts": "2026-10-28T19:28:38.370+00:00",
+      "node": "rag_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "kb",
+        "tool": "kb_search",
+        "hits": 11,
+        "latency_ms": 0.03
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 15,
+      "ts": "2026-10-28T19:28:38.370+00:00",
+      "node": "web_agent",
+      "event_type": "tool_result",
+      "payload": {
+        "route": "web",
+        "tool": "web_search",
+        "hits": 0,
+        "latency_ms": 0.0
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 16,
+      "ts": "2026-10-28T19:28:38.371+00:00",
+      "node": "merge",
+      "event_type": "merge",
+      "payload": {
+        "raw_evidences": 36,
+        "after_scope": 36,
+        "deduped": 14,
+        "after_budget_and_prefs": 14,
+        "excluded_by_reason": {
+          "duplicate_source": 22
+        },
+        "excluded": [
+          {
+            "source_ref": "doc:fixture-helios-perf §1 容量 (kb)",
+            "claim": "Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-pgvector-eco §2 生态 (kb)",
+            "claim": "pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-pgvector-cost §3 成本 (kb)",
+            "claim": "pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-pgvector-maturity §4 成熟度 (kb)",
+            "claim": "pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-pgvector-perf §1 容量 (kb)",
+            "claim": "pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-helios-maturity §4 成熟度 (kb)",
+            "claim": "Helios 在大型企业有亿级向量案例，版本节奏稳定；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-pgvector-eco §2 生态 (kb)",
+            "claim": "pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-eco §2 生态 (kb)",
+            "claim": "Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-pgvector-cost §3 成本 (kb)",
+            "claim": "pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-perf §1 容量 (kb)",
+            "claim": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-pgvector-maturity §4 成熟度 (kb)",
+            "claim": "pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-pgvector-perf §1 容量 (kb)",
+            "claim": "pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-nebula-perf §1 容量 (kb)",
+            "claim": "Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-cost §3 成本 (kb)",
+            "claim": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-nebula-maturity §4 成熟度 (kb)",
+            "claim": "Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-helios-perf §1 容量 (kb)",
+            "claim": "Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-eco §2 生态 (kb)",
+            "claim": "Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-perf §1 容量 (kb)",
+            "claim": "Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-nebula-perf §1 容量 (kb)",
+            "claim": "Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-helios-maturity §4 成熟度 (kb)",
+            "claim": "Helios 在大型企业有亿级向量案例，版本节奏稳定；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-atlas-cost §3 成本 (kb)",
+            "claim": "Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；",
+            "reason": "duplicate_source"
+          },
+          {
+            "source_ref": "doc:fixture-nebula-maturity §4 成熟度 (kb)",
+            "claim": "Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。",
+            "reason": "duplicate_source"
+          }
+        ],
+        "coverage": {
+          "vector-db/atlas": [
+            "cost",
+            "ecosystem",
+            "maturity",
+            "performance"
+          ],
+          "vector-db/helios": [
+            "cost",
+            "ecosystem",
+            "maturity",
+            "performance"
+          ],
+          "vector-db/nebula": [
+            "maturity",
+            "performance"
+          ],
+          "vector-db/pgvector": [
+            "cost",
+            "ecosystem",
+            "maturity",
+            "performance"
+          ]
+        }
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 17,
+      "ts": "2026-10-28T19:28:38.371+00:00",
+      "node": "verify",
+      "event_type": "verify",
+      "payload": {
+        "gaps": [],
+        "replan": false,
+        "constraint_summary": {
+          "verdict": "recommend",
+          "recommended_objects": [
+            "pgvector"
+          ],
+          "excluded": {
+            "atlas": [
+              "C5"
+            ],
+            "helios": [
+              "C2",
+              "C3",
+              "C5"
+            ]
+          },
+          "unknown_objects": [],
+          "findings": [
+            {
+              "constraint_id": "C1",
+              "object_name": "atlas",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E1",
+                "E2",
+                "E3",
+                "E4"
+              ],
+              "detail": "支持上限 10,000,000 / 要求 5,000,000"
+            },
+            {
+              "constraint_id": "C2",
+              "object_name": "atlas",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E1",
+                "E2",
+                "E3",
+                "E4"
+              ],
+              "detail": "最低团队 2 人 / 可用 5 人"
+            },
+            {
+              "constraint_id": "C3",
+              "object_name": "atlas",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E1",
+                "E2",
+                "E3",
+                "E4"
+              ],
+              "detail": "成本等级 0 / 上限 0"
+            },
+            {
+              "constraint_id": "C4",
+              "object_name": "atlas",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E1",
+                "E2",
+                "E3",
+                "E4"
+              ],
+              "detail": "支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted"
+            },
+            {
+              "constraint_id": "C5",
+              "object_name": "atlas",
+              "status": "violated",
+              "evidence_ids": [
+                "E1",
+                "E2",
+                "E3",
+                "E4"
+              ],
+              "detail": "需要新基础设施=True"
+            },
+            {
+              "constraint_id": "C1",
+              "object_name": "helios",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E5",
+                "E6",
+                "E7",
+                "E8"
+              ],
+              "detail": "支持上限 100,000,000 / 要求 5,000,000"
+            },
+            {
+              "constraint_id": "C2",
+              "object_name": "helios",
+              "status": "violated",
+              "evidence_ids": [
+                "E5",
+                "E6",
+                "E7",
+                "E8"
+              ],
+              "detail": "最低团队 10 人 / 可用 5 人"
+            },
+            {
+              "constraint_id": "C3",
+              "object_name": "helios",
+              "status": "violated",
+              "evidence_ids": [
+                "E5",
+                "E6",
+                "E7",
+                "E8"
+              ],
+              "detail": "成本等级 2 / 上限 0"
+            },
+            {
+              "constraint_id": "C4",
+              "object_name": "helios",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E5",
+                "E6",
+                "E7",
+                "E8"
+              ],
+              "detail": "支持部署方式 ['self-hosted'] / 要求 self-hosted"
+            },
+            {
+              "constraint_id": "C5",
+              "object_name": "helios",
+              "status": "violated",
+              "evidence_ids": [
+                "E5",
+                "E6",
+                "E7",
+                "E8"
+              ],
+              "detail": "需要新基础设施=True"
+            },
+            {
+              "constraint_id": "C1",
+              "object_name": "pgvector",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E11",
+                "E12",
+                "E13",
+                "E14"
+              ],
+              "detail": "支持上限 10,000,000 / 要求 5,000,000"
+            },
+            {
+              "constraint_id": "C2",
+              "object_name": "pgvector",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E11",
+                "E12",
+                "E13",
+                "E14"
+              ],
+              "detail": "最低团队 2 人 / 可用 5 人"
+            },
+            {
+              "constraint_id": "C3",
+              "object_name": "pgvector",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E11",
+                "E12",
+                "E13",
+                "E14"
+              ],
+              "detail": "成本等级 0 / 上限 0"
+            },
+            {
+              "constraint_id": "C4",
+              "object_name": "pgvector",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E11",
+                "E12",
+                "E13",
+                "E14"
+              ],
+              "detail": "支持部署方式 ['self-hosted'] / 要求 self-hosted"
+            },
+            {
+              "constraint_id": "C5",
+              "object_name": "pgvector",
+              "status": "satisfied",
+              "evidence_ids": [
+                "E11",
+                "E12",
+                "E13",
+                "E14"
+              ],
+              "detail": "需要新基础设施=False"
+            }
+          ],
+          "gaps": [],
+          "checked_objects": [
+            "atlas",
+            "helios",
+            "pgvector"
+          ]
+        }
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 18,
+      "ts": "2026-10-28T19:28:38.372+00:00",
+      "node": "synthesize",
+      "event_type": "synthesize",
+      "payload": {
+        "markdown_chars": 4905,
+        "citations": 33,
+        "evidences": 14,
+        "sources": 14,
+        "degraded": false,
+        "guard_ran": false,
+        "guard_quarantined": 0,
+        "guard_fallback": false,
+        "constraint_verdict": "recommend"
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    },
+    {
+      "seq": 19,
+      "ts": "2026-10-28T19:28:38.372+00:00",
+      "node": "persist",
+      "event_type": "persist",
+      "payload": {
+        "topic_recorded": true,
+        "snippets": 14
+      },
+      "latency_ms": 0.0,
+      "token_usage": 0
+    }
+  ]
+}

@@ -4,6 +4,7 @@
 M2 前走 InProcessKBClient，MCP 化后本子图零改动——事件名不变。
 """
 
+import hashlib
 import time
 
 from langgraph.graph.state import CompiledStateGraph
@@ -20,7 +21,7 @@ from app.schema.evidence import Evidence, Source
 from app.tools.kb_client import KBClient
 from app.trace.store import TraceStore
 
-RAG_TOP_K = 8  # 覆盖单对象全部研究维度（4 aspect）+ 对比性基准文档，保证领域内问题首轮收敛
+RAG_TOP_K = 8  # 默认值；fixture/特殊语料可通过 Settings.rag_top_k 调整
 
 
 def build_rag_agent(
@@ -38,10 +39,12 @@ def build_rag_agent(
             _trace("retry", {"route": "kb", "subtask_id": subtask.subtask_id, "attempt": attempt, "error": error})
 
         _trace("tool_call", {"route": "kb", "tool": "kb_search", "subtask_id": subtask.subtask_id,
-                             "query": subtask.query, "top_k": RAG_TOP_K})
+                             "query": subtask.query, "top_k": settings.rag_top_k,
+                             "constraints": [c.constraint_id for c in state.get("constraints", [])]})
         started = time.monotonic()
         result, error = fetch_with_retry(
-            lambda: kb_client.search(subtask.query, top_k=RAG_TOP_K, topic=subtask.topic or None),
+            lambda: kb_client.search(subtask.query, top_k=settings.rag_top_k,
+                                     topic=subtask.topic or None),
             max_retries=settings.tool_max_retries,
             base_delay=settings.tool_retry_base_delay,
             on_retry=_on_retry,
@@ -70,6 +73,8 @@ def build_rag_agent(
                         doc_id=doc.doc_id,
                         locator=doc.section or None,
                         url=None,
+                        content_hash=hashlib.sha256(doc.text.encode("utf-8")).hexdigest(),
+                        resolution="kb_document",
                     ),
                     claim=first_sentence(doc.text),
                     quote=doc.text[: settings.evidence_quote_max_chars],
@@ -79,6 +84,7 @@ def build_rag_agent(
                     aspect=doc.aspect or subtask.aspect,
                     route="kb",
                     score=hit.score,
+                    attributes=doc.attributes,
                 )
             )
         return {"evidences": evidences}

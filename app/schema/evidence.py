@@ -24,6 +24,15 @@ class Source(BaseModel):
     doc_id: str | None = None
     locator: str | None = Field(default=None, description="定位：网页锚点或知识库段落号，如 §2.1")
     retrieved_at: str = Field(default_factory=utc_now)
+    content_hash: str = Field(
+        default="", description="检索快照/知识库文档内容哈希（sha256），用于来源解析审计"
+    )
+    resolution: Literal["kb_document", "retrieval_snapshot", "unresolved"] = Field(
+        default="unresolved", description="来源解析到知识库文档还是本次检索快照"
+    )
+    url_reachable: bool | None = Field(
+        default=None, description="URL 当前是否可访问；评测不做网络探测时为 None"
+    )
 
     @property
     def ref(self) -> str:
@@ -45,3 +54,20 @@ class Evidence(BaseModel):
     aspect: str = Field(description="研究维度，如 performance / ecosystem / cost / maturity")
     route: Literal["web", "kb"]
     score: float = Field(default=0.0, description="检索打分（BM25 或等价），用于 merge 去重排序")
+    attributes: dict = Field(
+        default_factory=dict,
+        description="来源携带的结构化属性（fixture 的规模/团队/成本等），用于约束核验",
+    )
+
+
+class EvidenceDisposition(BaseModel):
+    """一条原始检索证据的最终去向：采用、因范围/重复/预算/相关性被排除。"""
+
+    evidence_key: str
+    claim: str
+    source_kind: Literal["web", "kb"]
+    source_ref: str
+    source_title: str = ""
+    status: Literal["adopted", "excluded"]
+    reason: str = ""
+    evidence_id: str | None = None
