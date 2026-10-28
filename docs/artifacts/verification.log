@@ -1,0 +1,85 @@
+# Verification log
+generated_at: 2026-10-28T19:28:21Z
+git_commit: f482c387924b39b164beb2a15b46d37a4b83293a
+git_dirty: 61 changed paths
+source_tree_fingerprint: 7a22bef99f3005bdf6e4c88d41e737391c00d930579aa714bf1485ab0737e97c
+tracked_diff_sha256: 102a342db15fdbc2acc310a2bde23f6f1d4f1a37cd9055a2dd201370fa5a8c7f
+python: Python 3.12.14
+platform: Darwin arm64
+
+$ ruff check .
+All checks passed!
+exit=0
+
+$ pytest -q
+........................................................................ [ 53%]
+...............................................................          [100%]
+135 passed in 13.07s
+exit=0
+
+$ python -m eval.run_eval --output docs/artifacts/eval-report.json
+[PASS] vector-db-compare: 11/11 断言通过
+[PASS] agent-framework-compare: 11/11 断言通过
+[PASS] llm-api-compare: 11/11 断言通过
+[PASS] single-object: 11/11 断言通过
+[PASS] out-of-domain: 11/11 断言通过
+
+评测完成：5/5 通过，报告已写入 docs/artifacts/eval-report.json
+exit=0
+
+$ python -m eval.run_offline_suite --output docs/artifacts/offline-suite-report.json
+[PASS] vdb-qdrant-vs-milvus-50m: 13/13 断言通过
+[PASS] agent-langgraph-vs-custom: 13/13 断言通过
+[PASS] llm-deepseek-vs-qwen: 13/13 断言通过
+[PASS] qdrant-prod-readiness: 13/13 断言通过
+[PASS] milvus-ops-burden: 13/13 断言通过
+[PASS] langgraph-debug-experience: 13/13 断言通过
+[PASS] deepseek-rate-limit-sla: 13/13 断言通过
+[PASS] vague-vector-db-choice: 13/13 断言通过
+[PASS] ood-community-health: 13/13 断言通过
+[PASS] nonsense-best-tech: 13/13 断言通过
+
+离线结构回归：10/10 通过，报告已写入 docs/artifacts/offline-suite-report.json
+exit=0
+
+$ python -m eval.run_constraint_fixture --output docs/artifacts/constraint-fixture-report.json
+[PASS] constraint-recommend-pgvector: 17/17 检查通过
+[PASS] constraint-no-solution: 15/15 检查通过
+[PASS] constraint-insufficient-attributes: 15/15 检查通过
+
+约束 fixture：3/3 通过，报告已写入 docs/artifacts/constraint-fixture-report.json
+exit=0
+
+$ python scripts/capture_demo.py
+已写入 docs/demo.md 与 docs/artifacts/demo/
+happy: 13 证据, routes=['kb', 'web']
+failure: degraded=True, gaps=6
+constraints: verdict=recommend, recommended=['pgvector'], excluded={'atlas': ['C5'], 'helios': ['C2', 'C3', 'C5']}
+replan: plan_rounds=2, plan_events=2
+guard: quarantined=2, invalid=['E99'], fallback=False
+exit=0
+
+$ python -m eval.online_runner --mode full --output-dir docs/artifacts/online
+在线评测未运行（NOT_RUN）：
+  - DR_MODE 当前为 'offline'，在线评测必须为 'online'
+  - DR_LLM_API_KEY 未配置：无法调用真实模型
+  - DR_SEARCH_PROVIDER 当前为 'demo'；在线评测需要真实搜索（tavily）
+  - full 双路评测不能使用内置演示 KB（data/corpus）；请设置 DR_KB_CORPUS_DIR 指向真实语料，或改用 --mode web-only
+已写入 docs/artifacts/online/NOT_RUN.json；未调用任何模型或搜索 API。
+exit=2
+
+$ python -m eval.online_runner --mode web-only --output-dir docs/artifacts/online-web
+在线评测未运行（NOT_RUN）：
+  - DR_MODE 当前为 'offline'，在线评测必须为 'online'
+  - DR_LLM_API_KEY 未配置：无法调用真实模型
+  - DR_SEARCH_PROVIDER 当前为 'demo'；在线评测需要真实搜索（tavily）
+已写入 docs/artifacts/online-web/NOT_RUN.json；未调用任何模型或搜索 API。
+exit=2
+
+=== artifact sha256 ===
+32b91721bed7b73eb0824455def7bc6518378eede8e0fb4eac33e32dacbe0b10  docs/artifacts/eval-report.json
+36969169aac37ba0b375a34fdbd81d92d8cf8cd71a4219417d6bec5ff7743c5c  docs/artifacts/offline-suite-report.json
+d8998eec643df31367dcf9b55f782b357cc377feb5d60fa73cf042afb4c0859f  docs/artifacts/constraint-fixture-report.json
+edf6d804089aa02de4c521cae84c6c89921878e69a355b44407ca2c6db1525e0  docs/artifacts/online/NOT_RUN.json
+9e6b9c822daeb3a0cfaf26520b56d033e3c41770fc1bcbac73fbe721a044f59b  docs/artifacts/online-web/NOT_RUN.json
+c8137cc56ac4356b4ee40cac646451107d6033c6098fa102f0f0770617c2071a  docs/artifacts/demo/manifest.json

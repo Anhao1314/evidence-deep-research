@@ -7,6 +7,8 @@ OpenAI 兼容协议（DeepSeek/通义/OpenAI 可切换）。上层图逻辑不�
 from dataclasses import dataclass, field
 from typing import Protocol
 
+from app.schema.constraints import Constraint, ConstraintSummary
+from app.schema.guard import GuardAudit, UnverifiedClaim
 from app.schema.plan import Plan
 from app.schema.report import Citation
 
@@ -19,6 +21,8 @@ class PlanContext:
     related_history: list[dict] = field(default_factory=list)
     # replan 时聚焦的缺口：[{"topic","object","missing_aspects":[...]}]
     replan_focus: list[dict] = field(default_factory=list)
+    # replan 时沿用首轮抽取的约束
+    constraints: list[Constraint] = field(default_factory=list)
     # 当前 run 的 trace_id，供 Provider 层落 usage/degrade 事件
     trace_id: str | None = None
 
@@ -29,6 +33,8 @@ class ComposeContext:
     evidences: list  # list[Evidence]
     information_gaps: list[str] = field(default_factory=list)
     preferences: dict[str, str] = field(default_factory=dict)
+    constraints: list[Constraint] = field(default_factory=list)
+    constraint_summary: ConstraintSummary | None = None
     trace_id: str | None = None
 
 
@@ -38,6 +44,9 @@ class ComposeResult:
     summary: str = ""
     citations: list[Citation] = field(default_factory=list)
     sources: list = field(default_factory=list)  # list[Source]，去重合并后的来源清单
+    raw_markdown: str = ""
+    guard_audit: GuardAudit | None = None
+    unverified_claims: list[UnverifiedClaim] = field(default_factory=list)
 
 
 class LLMProvider(Protocol):

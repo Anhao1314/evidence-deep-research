@@ -26,5 +26,12 @@ outputs/
 # IDE
 .idea/
 .vscode/
-eval-report.json
-.eval-smoke.json
+.DS_Store
+/eval-report.json
+/.eval-smoke.json
+/offline-suite-report.json
+/constraint-fixture-report.json
+
+# 评测运行产物（可由命令重新生成，不入库）
+eval/runs/
+eval/.run/

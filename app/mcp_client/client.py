@@ -32,7 +32,10 @@ from knowledge_base.retriever import ScoredDoc
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-_KB_DOC_FIELDS = ("doc_id", "title", "section", "text", "topic", "object_name", "aspect", "source_url")
+_KB_DOC_FIELDS = (
+    "doc_id", "title", "section", "text", "topic", "object_name", "aspect",
+    "source_url", "attributes",
+)
 
 
 class McpKBClient:

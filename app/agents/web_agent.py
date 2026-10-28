@@ -3,6 +3,7 @@
 检索事件（tool_call/tool_result/retry/degrade）落 trace。
 """
 
+import hashlib
 import time
 
 from langgraph.graph.state import CompiledStateGraph
@@ -37,7 +38,8 @@ def build_web_agent(
             _trace("retry", {"route": "web", "subtask_id": subtask.subtask_id, "attempt": attempt, "error": error})
 
         _trace("tool_call", {"route": "web", "tool": "web_search", "subtask_id": subtask.subtask_id,
-                             "query": subtask.query, "top_k": WEB_TOP_K})
+                             "query": subtask.query, "top_k": WEB_TOP_K,
+                             "constraints": [c.constraint_id for c in state.get("constraints", [])]})
         started = time.monotonic()
         result, error = fetch_with_retry(
             lambda: search_provider.search(subtask.query, top_k=WEB_TOP_K, topic=subtask.topic or None),
@@ -59,6 +61,7 @@ def build_web_agent(
         evidences = []
         for hit in state.get("hits", []):
             claim = hit.snippet or first_sentence(hit.content)
+            content = hit.content or hit.snippet
             evidences.append(
                 Evidence(
                     evidence_id="",
@@ -68,6 +71,11 @@ def build_web_agent(
                         title=hit.title,
                         url=hit.url,
                         locator=hit.published or None,
+                        content_hash=(
+                            hashlib.sha256(content.encode("utf-8")).hexdigest()
+                            if content else ""
+                        ),
+                        resolution="retrieval_snapshot" if content else "unresolved",
                     ),
                     claim=claim,
                     quote=hit.content[: settings.evidence_quote_max_chars],
@@ -76,6 +84,7 @@ def build_web_agent(
                     aspect=hit.aspect or subtask.aspect,
                     route="web",
                     score=hit.score,
+                    attributes=hit.attributes,
                 )
             )
         return {"evidences": evidences}

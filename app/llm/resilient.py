@@ -1,22 +1,35 @@
-"""弹性 LLM Provider：在线主路 + 规则兜底 + 统一引用 guard。
+"""弹性 LLM Provider：在线主路 + 规则兜底 + 引用 Guard。
 
-降级语义（都会落 trace）：
-- plan 失败（网络/解析）-> HeuristicProvider 的规则分解兜底；
-- compose 失败 -> 模板合成兜底；
-- compose 成功但引用非法 -> 受限重写一次，仍非法则剥离并告警。
-
-离线模式不经过本类（直接用 HeuristicProvider），但 ResilientProvider
-用 fake primary 测试，失败恢复行为在离线测试里可完整验证。
+Guard 语义（与 ADR-005 一致）：
+- 非法引用先做一次受限重写；重写必须通过“去掉引用后正文不变”的程序校验；
+- 重写仍不合法时，隔离受影响结论，不保留无引用结论；
+- 所有结论都被隔离时，回退到有引用的模板报告或安全占位（fail-closed）。
 """
+
+import re
 
 from app.llm.base import ComposeContext, ComposeResult, PlanContext
 from app.report.citation_guard import (
-    check_citations,
-    extract_citations,
-    strip_invalid_citations,
+    enforce_citation_guard,
+    extract_conclusion_citations,
 )
+from app.report.synth import collect_sources
+from app.schema.guard import GuardAction, GuardAudit
 from app.schema.plan import Plan
 from app.trace.store import TraceStore
+
+_CITE_RE = re.compile(r"\[(E\d+)\]")
+
+
+def _summary_from_markdown(markdown: str) -> str:
+    for line in markdown.splitlines():
+        text = line.strip()
+        if not text or text.startswith(("#", "|")):
+            continue
+        text = _CITE_RE.sub("", text).strip()
+        if text:
+            return text[:300]
+    return ""
 
 
 class ResilientProvider:
@@ -47,46 +60,74 @@ class ResilientProvider:
                 "error": str(exc)[:200],
                 "fallback": type(self._fallback).__name__,
             })
-            return self._fallback.compose(ctx)
-
-        valid = {e.evidence_id for e in ctx.evidences}
-        invalid = check_citations(result.markdown, valid)
-        if not invalid:
-            return result
-
-        # 受限重写一次
-        rewritten: str | None = None
-        rewriter = getattr(self._primary, "rewrite", None)
-        if rewriter is not None:
-            try:
-                rewritten = rewriter(result.markdown, invalid)
-            except Exception:  # noqa: BLE001 —— 重写失败走剥离
-                rewritten = None
-
-        if rewritten and not check_citations(rewritten, valid):
-            self._record(ctx.trace_id, "degrade", {
-                "stage": "citation_rewrite", "invalid_ids": invalid, "fixed_by": "rewrite",
-            })
-            return ComposeResult(
-                markdown=rewritten,
-                summary=result.summary,
-                citations=extract_citations(rewritten, ctx.evidences),
-                sources=result.sources,
+            fallback = self._fallback.compose(ctx)
+            fallback.guard_audit = GuardAudit(
+                ran=False,
+                raw_markdown=fallback.markdown,
+                final_markdown=fallback.markdown,
+                actions=[GuardAction(action="not_run", detail="在线主路失败，使用模板兜底")],
             )
+            return fallback
 
-        # 二次仍非法：剥离非法引用（宁可无引用，不可假引用）
-        cleaned = strip_invalid_citations(result.markdown, invalid)
-        self._record(ctx.trace_id, "error", {
-            "stage": "citation_guard",
-            "invalid_ids": invalid,
-            "action": "stripped",
-        })
-        return ComposeResult(
-            markdown=cleaned,
-            summary=result.summary,
-            citations=extract_citations(cleaned, ctx.evidences),
-            sources=result.sources,
+        valid_ids = {e.evidence_id for e in ctx.evidences}
+        rewriter = getattr(self._primary, "rewrite", None)
+        fallback_result: ComposeResult | None = None
+
+        def _fallback_markdown() -> str:
+            nonlocal fallback_result
+            if self._fallback is None:
+                raise RuntimeError("no fallback provider")
+            fallback_result = self._fallback.compose(ctx)
+            return fallback_result.markdown
+
+        audit = enforce_citation_guard(
+            result.markdown,
+            valid_ids,
+            rewrite_fn=rewriter,
+            fallback_fn=_fallback_markdown if self._fallback is not None else None,
         )
+        final_md = audit.final_markdown
+        citations = extract_conclusion_citations(final_md, ctx.evidences)
+        sources = result.sources or collect_sources(ctx.evidences)
+        summary = _summary_from_markdown(final_md)
+        if fallback_result is not None:
+            sources = fallback_result.sources or sources
+            summary = fallback_result.summary or summary
+
+        self._record_guard(ctx.trace_id, audit)
+        return ComposeResult(
+            markdown=final_md,
+            raw_markdown=result.markdown,
+            summary=summary,
+            citations=citations,
+            sources=sources,
+            guard_audit=audit,
+            unverified_claims=audit.unverified_claims,
+        )
+
+    def _record_guard(self, trace_id: str | None, audit: GuardAudit) -> None:
+        if self._trace_store is None or not trace_id:
+            return
+        if (not audit.invalid_citation_ids and not audit.rewrite_attempted
+                and not audit.claims_quarantined and not audit.fallback_used
+                and not audit.fail_closed):
+            return
+        quarantined = audit.claims_quarantined > 0
+        event_type = "error" if (quarantined or audit.fail_closed) else "degrade"
+        self._record(trace_id, event_type, {
+            "stage": "citation_guard",
+            "actions": [a.model_dump() for a in audit.actions],
+            "invalid_ids": audit.invalid_citation_ids,
+            "rewrite_attempted": audit.rewrite_attempted,
+            "rewrite_accepted": audit.rewrite_accepted,
+            "rewrite_rejected_reason": audit.rewrite_rejected_reason,
+            "claims_checked": audit.claims_checked,
+            "claims_quarantined": audit.claims_quarantined,
+            "fallback_used": audit.fallback_used,
+            "fail_closed": audit.fail_closed,
+            "unverified_claims": [c.model_dump() for c in audit.unverified_claims],
+            "diff": audit.diff,
+        })
 
     def _record(self, trace_id: str | None, event_type: str, payload: dict) -> None:
         if self._trace_store is not None and trace_id:

@@ -1,0 +1,39 @@
+{
+  "suite_id": "offline-relevance-v1",
+  "version": "1.0.0",
+  "description": "人工预置的离线相关性标签：只用于验证预置场景下的证据排除行为，不是在线通用语义相关率。",
+  "cases": {
+    "ood-community-health": {
+      "question": "怎么评估一个开源项目的社区健康度？",
+      "relevant_doc_ids": [],
+      "irrelevant_doc_ids": [
+        "kb-qdrant-perf",
+        "kb-qdrant-eco",
+        "kb-qdrant-cost",
+        "kb-qdrant-maturity",
+        "kb-milvus-perf",
+        "kb-milvus-eco",
+        "kb-milvus-cost",
+        "kb-milvus-maturity",
+        "kb-vdb-bench",
+        "kb-langgraph-perf",
+        "kb-langgraph-eco",
+        "kb-langgraph-cost",
+        "kb-langgraph-maturity",
+        "kb-custom-perf",
+        "kb-custom-eco",
+        "kb-custom-cost",
+        "kb-custom-maturity",
+        "kb-deepseek-perf",
+        "kb-deepseek-cost",
+        "kb-deepseek-eco",
+        "kb-deepseek-maturity",
+        "kb-qwen-perf",
+        "kb-qwen-cost",
+        "kb-qwen-eco",
+        "kb-qwen-maturity"
+      ],
+      "label_note": "内置语料只覆盖向量库/Agent 框架/LLM API，与社区健康度问题全部无关。"
+    }
+  }
+}

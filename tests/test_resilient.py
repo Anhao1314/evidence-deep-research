@@ -105,16 +105,30 @@ def test_citation_rewrite_success(tmp_path):
     provider = ResilientProvider(_BadCitationProvider(), fallback=None, trace_store=trace)
     result = provider.compose(_ctx([_ev(1), _ev(2)]))
     assert "[E99]" not in result.markdown and "[E2]" in result.markdown
-    degrade = [e for e in trace.get("run-guard") if e.event_type == "degrade"]
-    assert degrade and degrade[0].payload["fixed_by"] == "rewrite"
+    assert result.guard_audit is not None
+    assert result.guard_audit.rewrite_accepted is True
+    assert result.guard_audit.claims_quarantined == 0
+    guard_events = [e for e in trace.get("run-guard")
+                    if e.payload.get("stage") == "citation_guard"]
+    assert guard_events
+    assert "rewrite_accepted" in [a["action"] for a in guard_events[0].payload["actions"]]
     trace.close()
 
 
-def test_citation_stripped_when_rewrite_fails(tmp_path):
+def test_citation_quarantined_when_rewrite_fails(tmp_path):
     trace = TraceStore(tmp_path / "r4.sqlite3")
     provider = ResilientProvider(_StubbornBadProvider(), fallback=None, trace_store=trace)
     result = provider.compose(_ctx([_ev(1)]))
-    assert "[E99]" not in result.markdown, "重写失败必须剥离非法引用"
-    errors = [e for e in trace.get("run-guard") if e.event_type == "error"]
-    assert errors and errors[0].payload["action"] == "stripped"
+    assert result.guard_audit is not None
+    assert result.guard_audit.rewrite_accepted is False
+    assert result.guard_audit.claims_quarantined == 1
+    assert result.guard_audit.fail_closed is True
+    assert result.unverified_claims
+    assert "选 A" not in result.markdown, "无引用的模型结论不得进入主报告"
+    guard_events = [e for e in trace.get("run-guard")
+                    if e.payload.get("stage") == "citation_guard"]
+    assert guard_events and guard_events[0].event_type == "error"
+    payload = guard_events[0].payload
+    assert payload["unverified_claims"]
+    assert payload["claims_quarantined"] == 1
     trace.close()

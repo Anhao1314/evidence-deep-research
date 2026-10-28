@@ -1,0 +1,75 @@
+{
+  "case_id": "failure",
+  "title": "真实失败：两路检索均失败（故障注入）",
+  "question": "Qdrant 和 Milvus 哪个更适合生产环境？",
+  "run_id": "demo-failure",
+  "fault_injection": {
+    "kb_client": "ConnectionError('demo fault injection: MCP KB connection reset')",
+    "search_provider": "TimeoutError('demo fault injection: search API timeout')",
+    "tool_max_retries": 1,
+    "note": "故障由脚本显式注入，用于展示重试、降级、缺口与 Trace；不代表真实线上事故。"
+  },
+  "constraint_check": null,
+  "controlled_fixture": null,
+  "fixture_note": null,
+  "kb_backend": "FaultyKBClient（注入）",
+  "report_id": "demo-failure",
+  "routes_used": [],
+  "routes_attempted": [
+    "kb",
+    "web"
+  ],
+  "degraded": true,
+  "plan_rounds": 1,
+  "step_count": 4,
+  "information_gaps": [
+    "Qdrant 缺少维度证据：性能、生态、成本、成熟度",
+    "Milvus 缺少维度证据：性能、生态、成本、成熟度",
+    "kb 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset",
+    "web 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout",
+    "kb 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset",
+    "web 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout"
+  ],
+  "evidence_count": 0,
+  "source_count": 0,
+  "trace_event_count": 23,
+  "token_usage": 0,
+  "plan_event_count": 1,
+  "dispatch_event_count": 1,
+  "constraint_summary": {
+    "verdict": "not_checked",
+    "recommended_objects": [],
+    "excluded": {},
+    "unknown_objects": [],
+    "findings": [],
+    "gaps": [],
+    "checked_objects": []
+  },
+  "guard_audit": {
+    "ran": false,
+    "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：Qdrant 和 Milvus 哪个更适合生产环境？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- Qdrant 缺少维度证据：性能、生态、成本、成熟度\n- Milvus 缺少维度证据：性能、生态、成本、成熟度\n- kb 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset\n- web 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout\n- kb 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset\n- web 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout",
+    "final_markdown": "# 技术选型研究报告\n\n> 研究问题：Qdrant 和 Milvus 哪个更适合生产环境？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- Qdrant 缺少维度证据：性能、生态、成本、成熟度\n- Milvus 缺少维度证据：性能、生态、成本、成熟度\n- kb 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset\n- web 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout\n- kb 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset\n- web 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout",
+    "diff": "",
+    "invalid_citation_ids": [],
+    "rewrite_attempted": false,
+    "rewrite_accepted": null,
+    "rewrite_rejected_reason": null,
+    "claims_checked": 0,
+    "claims_quarantined": 0,
+    "actions": [
+      {
+        "action": "not_run",
+        "detail": "离线模板合成，无模型引用需要校验"
+      }
+    ],
+    "unverified_claims": [],
+    "fallback_used": false,
+    "fail_closed": false
+  },
+  "unverified_claims": [],
+  "evidence_disposition": {
+    "adopted": 0,
+    "excluded": 0,
+    "excluded_reasons": []
+  }
+}

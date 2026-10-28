@@ -9,9 +9,10 @@ import json
 import sys
 from pathlib import Path
 
-from app.config import Settings
+from app.config import PROJECT_ROOT, Settings
 from app.graph.factory import build_default_app
 from eval.assertions import DEFAULT_CASES, load_cases, run_case
+from eval.provenance import git_commit, git_dirty, now_iso, source_manifest
 
 
 def main() -> int:
@@ -47,6 +48,9 @@ def main() -> int:
 
     passed = sum(1 for r in results if r["passed"])
     report = {"total": len(results), "passed": passed, "failed": len(results) - passed,
+              "generated_at": now_iso(), "git_commit": git_commit(PROJECT_ROOT),
+              "git_dirty": git_dirty(PROJECT_ROOT),
+              "source_manifest": source_manifest(PROJECT_ROOT),
               "results": results}
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n评测完成：{passed}/{len(results)} 通过，报告已写入 {args.output}")

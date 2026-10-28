@@ -1,0 +1,48 @@
+{
+  "suite_id": "constraint-fixtures-v1",
+  "version": "1.0.0",
+  "description": "离线合成 fixture：验证用户约束是否真正进入结论，而不是只在报告末尾追加关键词。这些名称仅作为合成 fixture 中的评测对象，结构化属性为测试构造，不代表同名真实产品的真实能力，也不构成真实技术选型建议。",
+  "fixture": {
+    "corpus_dir": "data/fixtures/constraint_selection",
+    "web_demo_dir": "data/fixtures/constraint_selection/web",
+    "note": "KB-only fixture；web_demo.jsonl 为空，避免用演示网页数据掩盖约束核验。"
+  },
+  "cases": [
+    {
+      "case_id": "constraint-recommend-pgvector",
+      "question": "我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？",
+      "expected_verdict": "recommend",
+      "expected_recommended": ["pgvector"],
+      "expected_excluded_objects": ["atlas", "helios"],
+      "expected_unknown_objects": [],
+      "expected_constraint_kinds": ["scale", "team", "cost", "deployment", "stack"],
+      "must_contain": ["约束核对", "唯一满足全部可核验约束", "pgvector"],
+      "must_not_contain": ["推荐 Atlas", "推荐 Helios"],
+      "expect_gaps": false
+    },
+    {
+      "case_id": "constraint-no-solution",
+      "question": "我们需要 5000 万条向量、5 人团队、自托管、预算有限，Atlas 和 Helios 怎么选？",
+      "expected_verdict": "no_solution",
+      "expected_recommended": [],
+      "expected_excluded_objects": ["atlas", "helios"],
+      "expected_unknown_objects": [],
+      "expected_constraint_kinds": ["scale", "team", "cost", "deployment"],
+      "must_contain": ["没有任何对象同时满足全部约束", "需要放宽至少一项约束"],
+      "must_not_contain": ["唯一满足全部可核验约束"],
+      "expect_gaps": true
+    },
+    {
+      "case_id": "constraint-insufficient-attributes",
+      "question": "我们需要 5000 万条向量、5 人团队、自托管，Atlas、Helios 和 Nebula 怎么选？",
+      "expected_verdict": "insufficient",
+      "expected_recommended": [],
+      "expected_excluded_objects": ["atlas", "helios"],
+      "expected_unknown_objects": ["nebula"],
+      "expected_constraint_kinds": ["scale", "team", "deployment"],
+      "must_contain": ["约束核验信息不足", "无法判断"],
+      "must_not_contain": ["唯一满足全部可核验约束"],
+      "expect_gaps": true
+    }
+  ]
+}

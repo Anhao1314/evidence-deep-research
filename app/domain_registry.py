@@ -38,6 +38,11 @@ OBJECT_DISPLAY: dict[str, str] = {
     "custom": "自研编排",
     "deepseek": "DeepSeek",
     "qwen": "Qwen（通义千问）",
+    # 约束 fixture 的对象（离线合成数据，不是真实产品）
+    "atlas": "Atlas",
+    "helios": "Helios",
+    "pgvector": "pgvector",
+    "nebula": "Nebula",
 }
 
 

@@ -13,8 +13,9 @@ import httpx
 
 from app.domain_registry import DomainRegistry
 from app.llm.base import ComposeContext, ComposeResult, PlanContext
-from app.report.citation_guard import extract_citations, rewrite_prompt
+from app.report.citation_guard import extract_conclusion_citations, rewrite_prompt
 from app.report.synth import collect_sources
+from app.schema.constraints import Constraint
 from app.schema.plan import Plan, SubTask
 
 
@@ -50,10 +51,12 @@ class OpenAICompatProvider:
         payload = self._chat(
             system=(
                 "你是研究任务规划器。把用户的技术选型问题分解为检索子任务。"
-                "只输出 JSON：{\"rationale\": str, \"subtasks\": [{\"route\": \"web\"|\"kb\", "
+                "只输出 JSON：{\"rationale\": str, \"constraints\": [{\"kind\": "
+                "\"scale|team|cost|deployment|stack|latency|compliance|other\", \"text\": str, "
+                "\"value\": str, \"unit\": str}], \"subtasks\": [{\"route\": \"web\"|\"kb\", "
                 "\"topic\": str, \"object_name\": str, \"object_display\": str, \"aspect\": str, \"query\": str}]}。"
                 "对比型问题按对象拆分；每对象同时给 web 与 kb 两条路；"
-                "replan 时只针对给定缺口生成补充子任务。"
+                "replan 时只针对给定缺口生成补充子任务，并沿用已有约束。"
             ),
             user=self._plan_user_prompt(ctx),
             trace_id=ctx.trace_id,
@@ -70,6 +73,11 @@ class OpenAICompatProvider:
         if ctx.related_history:
             hist = "; ".join(h.get("question", "") for h in ctx.related_history)
             parts.append(f"该用户的相关历史研究（避免重复、可复用结论）：{hist}")
+        if ctx.constraints:
+            parts.append(
+                "已抽取的用户约束（沿用，不得忽略）："
+                + json.dumps([c.model_dump() for c in ctx.constraints], ensure_ascii=False)
+            )
         if ctx.replan_focus:
             parts.append(f"上轮信息缺口：{json.dumps(ctx.replan_focus, ensure_ascii=False)}")
         return "\n".join(parts)
@@ -89,8 +97,24 @@ class OpenAICompatProvider:
                 )
                 for i, s in enumerate(data.get("subtasks", []))
             ]
+            constraints = []
+            allowed_kinds = {"scale", "team", "cost", "deployment", "stack",
+                             "latency", "compliance", "other"}
+            for i, item in enumerate(data.get("constraints", []), start=1):
+                if not isinstance(item, dict):
+                    continue
+                kind = item.get("kind", "other")
+                if kind not in allowed_kinds:
+                    kind = "other"
+                constraints.append(Constraint(
+                    constraint_id=f"C{i}",
+                    kind=kind,
+                    text=str(item.get("text", "")),
+                    value=str(item.get("value", "")),
+                    unit=str(item.get("unit", "")),
+                ))
             return Plan(plan_id=f"plan-{uuid.uuid4().hex[:8]}", subtasks=subtasks,
-                        rationale=data.get("rationale", ""))
+                        rationale=data.get("rationale", ""), constraints=constraints)
         except (ValueError, KeyError, TypeError) as exc:
             raise PlanError(f"模型计划解析失败: {exc}") from exc
 
@@ -101,21 +125,44 @@ class OpenAICompatProvider:
             f"[{e.evidence_id}] (来源[{e.source.source_id}]) {e.claim}：{e.quote[:160]}"
             for e in ctx.evidences
         ]
+        parts = [f"研究问题：{ctx.question}"]
+        if ctx.constraints:
+            parts.append(
+                "用户约束（必须逐项回应；不得忽略，也不得编造满足情况）：\n"
+                + "\n".join(
+                    f"- [{c.constraint_id}] {c.text}（kind={c.kind}, value={c.value}）"
+                    for c in ctx.constraints
+                )
+            )
+        if ctx.constraint_summary is not None:
+            parts.append(
+                "结构化约束核验结果（只能据此陈述 satisfied/violated/unknown，"
+                "unknown 必须写成无法判断）：\n"
+                + json.dumps(ctx.constraint_summary.model_dump(), ensure_ascii=False)
+            )
+        if ctx.information_gaps:
+            parts.append(
+                "已知信息缺口（必须在报告中单列并明确说明，禁止假装已解决）：\n"
+                + "\n".join(f"- {g}" for g in ctx.information_gaps)
+            )
+        parts.append("证据清单：\n" + "\n".join(evidence_lines))
         md = self._chat(
             system=(
                 "你是研究报告撰写者。仅依据给定证据撰写中文研究报告（markdown），"
-                "包含：结论摘要、分维度对比（若为对比问题）、风险与信息缺口。"
+                "包含：结论摘要、约束核对、分维度对比（若为对比问题）、风险与信息缺口。"
                 "每个结论句末必须标注其依据的证据编号，形如 [E3][E7]；"
                 "禁止使用清单之外的编号；证据不足的结论必须明说。"
+                "不得把 unknown 的结构化约束写成已满足。"
             ),
-            user=f"研究问题：{ctx.question}\n\n证据清单：\n" + "\n".join(evidence_lines),
+            user="\n\n".join(parts),
             trace_id=ctx.trace_id,
             stage="compose",
         )
         return ComposeResult(
             markdown=md,
+            raw_markdown=md,
             summary=self._first_paragraph(md),
-            citations=extract_citations(md, ctx.evidences),
+            citations=extract_conclusion_citations(md, ctx.evidences),
             sources=collect_sources(list(ctx.evidences)),
         )
 
@@ -162,7 +209,15 @@ class OpenAICompatProvider:
                 )
                 if resp.status_code == 200:
                     data = resp.json()
-                    self._record_usage(trace_id, stage, int(data.get("usage", {}).get("total_tokens", 0)))
+                    usage = data.get("usage") or {}
+                    prompt_tokens = int(usage.get("prompt_tokens") or 0)
+                    completion_tokens = int(usage.get("completion_tokens") or 0)
+                    total_tokens = int(
+                        usage.get("total_tokens") or prompt_tokens + completion_tokens
+                    )
+                    self._record_usage(
+                        trace_id, stage, total_tokens, prompt_tokens, completion_tokens
+                    )
                     return data["choices"][0]["message"]["content"]
                 last_error = RuntimeError(f"LLM HTTP {resp.status_code}: {resp.text[:120]}")
                 if resp.status_code < 500 and resp.status_code != 429:
@@ -173,11 +228,25 @@ class OpenAICompatProvider:
                 time.sleep(self.retry_base_delay * (2**attempt))
         raise last_error or RuntimeError("LLM 调用失败")
 
-    def _record_usage(self, trace_id: str | None, stage: str, tokens: int) -> None:
+    def _record_usage(
+        self,
+        trace_id: str | None,
+        stage: str,
+        tokens: int,
+        prompt_tokens: int = 0,
+        completion_tokens: int = 0,
+    ) -> None:
         if self._trace_store is not None and trace_id and tokens > 0:
             self._trace_store.record(
                 trace_id, node="llm", event_type="usage",
-                payload={"stage": stage, "model": self.model}, token_usage=tokens,
+                payload={
+                    "stage": stage,
+                    "model": self.model,
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
+                    "total_tokens": tokens,
+                },
+                token_usage=tokens,
             )
 
     @staticmethod

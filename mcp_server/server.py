@@ -54,6 +54,7 @@ def kb_search(query: str, top_k: int = 4, topic: str | None = None) -> list[dict
             "object_name": h.doc.object_name,
             "aspect": h.doc.aspect,
             "source_url": h.doc.source_url,
+            "attributes": h.doc.attributes,
             "score": h.score,
         }
         for h in hits
@@ -74,6 +75,7 @@ def kb_get_doc(doc_id: str) -> dict:
                 "object_name": doc.object_name,
                 "aspect": doc.aspect,
                 "source_url": doc.source_url,
+                "attributes": doc.attributes,
             }
     return {"error": f"doc not found: {doc_id}"}
 

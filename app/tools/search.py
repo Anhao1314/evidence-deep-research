@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 from typing import Protocol
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from knowledge_base.bm25 import BM25Index
 
@@ -25,6 +25,7 @@ class WebHit(BaseModel):
     aspect: str = "general"
     published: str = ""
     score: float = 0.0  # 检索打分，随结果透传给证据层
+    attributes: dict = Field(default_factory=dict, description="结构化属性，用于约束核验")
 
 
 class SearchProvider(Protocol):

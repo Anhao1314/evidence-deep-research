@@ -1,0 +1,829 @@
+{
+  "generated_at": "2026-10-28T19:28:38+00:00",
+  "git_commit": "f482c387924b39b164beb2a15b46d37a4b83293a",
+  "git_dirty": true,
+  "source_manifest": {
+    "schema_version": "1.0",
+    "git_commit": "f482c387924b39b164beb2a15b46d37a4b83293a",
+    "git_dirty": true,
+    "tracked_diff_sha256": "102a342db15fdbc2acc310a2bde23f6f1d4f1a37cd9055a2dd201370fa5a8c7f",
+    "tracked_diff_bytes": 130095,
+    "changed_paths": [
+      ".env.example",
+      ".github/workflows/ci.yml",
+      ".gitignore",
+      "README.md",
+      "app/agents/base.py",
+      "app/agents/rag_agent.py",
+      "app/agents/web_agent.py",
+      "app/config.py",
+      "app/domain_registry.py",
+      "app/graph/factory.py",
+      "app/graph/nodes.py",
+      "app/graph/state.py",
+      "app/llm/base.py",
+      "app/llm/heuristic.py",
+      "app/llm/openai_compat.py",
+      "app/llm/resilient.py",
+      "app/mcp_client/client.py",
+      "app/report/__init__.py",
+      "app/report/citation_guard.py",
+      "app/report/synth.py",
+      "app/schema/evidence.py",
+      "app/schema/plan.py",
+      "app/schema/report.py",
+      "app/tools/kb_client.py",
+      "app/tools/search.py",
+      "docs/adr/ADR-005-citation-guard.md",
+      "eval/assertions.py",
+      "eval/run_eval.py",
+      "knowledge_base/corpus.py",
+      "mcp_server/server.py",
+      "tests/test_resilient.py",
+      "tests/test_trace.py"
+    ],
+    "untracked_source_files": [
+      {
+        "path": "app/constraints.py",
+        "sha256": "0d32cf237f20689f5fa0f6b2fb68285080c03c86227e4fce9dac1506e7942083"
+      },
+      {
+        "path": "app/schema/constraints.py",
+        "sha256": "ae6e0da8de79d6646a0c6d7dbefdf84b4040a437e4e541adadc82d9d84fbcc1c"
+      },
+      {
+        "path": "app/schema/guard.py",
+        "sha256": "1b47838cafa3ffcdba8caaf7136fea177351e7a969837c52a1e0da17c6286d3c"
+      },
+      {
+        "path": "data/fixtures/constraint_selection/corpus.jsonl",
+        "sha256": "36cfdb3bd76544f93131f76f4d7f472e7b72eb190e18f7fe3c453367af6d2c3f"
+      },
+      {
+        "path": "data/fixtures/constraint_selection/web/web_demo.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "docs/demo-script.md",
+        "sha256": "c29b3be00b1dd895dd43b21af54dec0e609818b004cb193b58a74447a385a64e"
+      },
+      {
+        "path": "docs/evaluation.md",
+        "sha256": "d081b494ac39d11e0946f69f58e42ef381d4e734cd167dd66d205647e0d86ca8"
+      },
+      {
+        "path": "eval/annotation.py",
+        "sha256": "d09e5894068da4611745a64901176614ccf319d449d7925bfedc07882d4e999c"
+      },
+      {
+        "path": "eval/fixtures/constraint_tasks.v1.json",
+        "sha256": "019e47542ae058e0992324f41e17b932e908d0e48fe76a73881e099ad63627b2"
+      },
+      {
+        "path": "eval/fixtures/relevance_labels.v1.json",
+        "sha256": "96b72ad74e2dd00287097d07289bc6424eae5c8d2db7d40f84621424a63c878b"
+      },
+      {
+        "path": "eval/metrics.py",
+        "sha256": "9732a96381199f91c6163cf8ce0a54692d3144b9b549e315887c3eed3c9b4f3d"
+      },
+      {
+        "path": "eval/online_runner.py",
+        "sha256": "e3dc505ff6834743b54914e526fae8fe52e64200b1fa2ced0aa9e64ed38a4b9e"
+      },
+      {
+        "path": "eval/provenance.py",
+        "sha256": "1d546efd1c486dbef46c61e9f6ce213463c84c6c01dd8f9002181e5327b6313f"
+      },
+      {
+        "path": "eval/run_constraint_fixture.py",
+        "sha256": "e3ee93932df6ba1f404ca91d6c4d9bee37ae0e33b994152afbafdc779a7fe1f7"
+      },
+      {
+        "path": "eval/run_offline_suite.py",
+        "sha256": "46f85785896042bdbaba8e9ff3aff66fbc453d54c4cbade8834dd48bb8f52c69"
+      },
+      {
+        "path": "eval/task_suite.py",
+        "sha256": "c0750e517cbe6ed4e03559e4e65bd15b73c026741cebdfc0e1be978d917bb275"
+      },
+      {
+        "path": "eval/tasks/research_tasks.v1.json",
+        "sha256": "6a37b65b407830f864a7281b09ec036c87ef9e3a3ae2a69a783d305b5a47c97b"
+      },
+      {
+        "path": "eval/tasks/research_tasks.v1.web-only.json",
+        "sha256": "5a46346527b6c8cf066fd7df9b5a05594e9bd2def434bf80ca92ee5589e2e7eb"
+      },
+      {
+        "path": "scripts/capture_demo.py",
+        "sha256": "a266ebf0b0fd62f15762e4d52f79983fb16b521e45af903ca2cec5a1d3767b90"
+      },
+      {
+        "path": "tests/test_annotation.py",
+        "sha256": "cfdee8efee599ebab1ee5f8e5454c986525a72ceeaccb90f2ff32ecae5df9406"
+      },
+      {
+        "path": "tests/test_citation_guard.py",
+        "sha256": "36b0f7c502ae87ef8d5c675a3f6a824698e1b1df5a402041c41de284301aa4c1"
+      },
+      {
+        "path": "tests/test_constraint_fixture.py",
+        "sha256": "58da123a195cf735e406414b489eaf546f210051af432edd312b381bfcdff445"
+      },
+      {
+        "path": "tests/test_constraints.py",
+        "sha256": "9bc878b9c953a76e3a4c14c4f9fa585e06e4d6e251cabc55791c7e3b1c2d6185"
+      },
+      {
+        "path": "tests/test_eval_metrics.py",
+        "sha256": "bbe32435e5a4343c264e797c5f281a174deb1ba4ff0efdc2856ef102bd1abc94"
+      },
+      {
+        "path": "tests/test_online_prompt.py",
+        "sha256": "ef3efa0b57b97a2762e862de545789f329c3a939906f9021a0c075a0e3cccc77"
+      },
+      {
+        "path": "tests/test_online_runner.py",
+        "sha256": "aa30cf4b071dc139fae1cbac2e5e54378067e6d4de6c6d4cae43bf874a4d2ebd"
+      },
+      {
+        "path": "tests/test_provenance.py",
+        "sha256": "7c78eb1c566e61c0ffacafbfe1c477921a50ce0766070aef56f7238e9a2a008b"
+      },
+      {
+        "path": "tests/test_relevance_fixture.py",
+        "sha256": "73f54bc2d1e81091480b29f4e6ff5c4e91d0c04e383c34e4619befc2e8aa8ec3"
+      },
+      {
+        "path": "tests/test_replan_deterministic.py",
+        "sha256": "b451ffde3e2e1c8abb0e80aa047056d363a0ecbe0253616af1665a213f435531"
+      },
+      {
+        "path": "tests/test_task_suite.py",
+        "sha256": "035ac13d0e700fa1c32151f4c53abf79169ec162e2118bb6bb3e3f82a2ad8700"
+      }
+    ],
+    "untracked_source_count": 30,
+    "source_tree_fingerprint": "7a22bef99f3005bdf6e4c88d41e737391c00d930579aa714bf1485ab0737e97c",
+    "note": "不 commit 场景下的源码指纹；diff 与未跟踪源码文件哈希共同决定。"
+  },
+  "python": "3.12.14",
+  "platform": "macOS-26.6-arm64-arm-64bit",
+  "mode": "offline",
+  "note": "所有报告、Trace 与计数均由 scripts/capture_demo.py 真实执行生成。",
+  "scenarios": {
+    "happy": {
+      "case_id": "happy",
+      "title": "正常路径：双对象对比研究",
+      "question": "RAG 系统的向量库选 Qdrant 还是 Milvus？",
+      "run_id": "demo-happy",
+      "fault_injection": null,
+      "constraint_check": null,
+      "controlled_fixture": null,
+      "fixture_note": null,
+      "kb_backend": "McpKBClient",
+      "report_id": "demo-happy",
+      "routes_used": [
+        "kb",
+        "web"
+      ],
+      "routes_attempted": [
+        "kb",
+        "web"
+      ],
+      "degraded": false,
+      "plan_rounds": 1,
+      "step_count": 4,
+      "information_gaps": [],
+      "evidence_count": 13,
+      "source_count": 13,
+      "trace_event_count": 15,
+      "token_usage": 0,
+      "plan_event_count": 1,
+      "dispatch_event_count": 1,
+      "constraint_summary": {
+        "verdict": "not_checked",
+        "recommended_objects": [],
+        "excluded": {},
+        "unknown_objects": [],
+        "findings": [],
+        "gaps": [],
+        "checked_objects": []
+      },
+      "guard_audit": {
+        "ran": false,
+        "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：RAG 系统的向量库选 Qdrant 还是 Milvus？\n\n## 结论摘要\n\n**Qdrant**：性能：Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8]；生态：Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10]；成本：Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11]；成熟度：Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12]。\n\n**Milvus**：性能：VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1]；生态：Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4]；成本：Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5]；成熟度：Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7]。\n\n## 分维度对比\n\n| 维度 | Qdrant | Milvus |\n|---|---|---|\n| 性能 | Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8] | VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1] |\n| 生态 | Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10] | Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4] |\n| 成本 | Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11] | Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5] |\n| 成熟度 | Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12] | Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7] |\n\n## 证据明细\n\n- **[E1]** VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；（来源 [S1]：doc:kb-vdb-bench §5 基准 (kb)）\n- **[E2]** Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。（来源 [S2]：doc:kb-milvus-perf §1 架构与延迟 (kb)）\n- **[E3]** GPU 索引让亿级向量检索吞吐提升 10 倍量级。（来源 [S3]：https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)）\n- **[E4]** Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。（来源 [S4]：doc:kb-milvus-eco §2 生态 (kb)）\n- **[E5]** Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。（来源 [S5]：doc:kb-milvus-cost §3 成本 (kb)）\n- **[E6]** 托管 Milvus 按存储与 CU 计费，起步价高于自托管。（来源 [S6]：https://zilliz.com/pricing 2025-01-15 (web)）\n- **[E7]** Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。（来源 [S7]：doc:kb-milvus-maturity §4 成熟度 (kb)）\n- **[E8]** Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。（来源 [S8]：https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)）\n- **[E9]** Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。（来源 [S9]：doc:kb-qdrant-perf §1 架构与延迟 (kb)）\n- **[E10]** Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。（来源 [S10]：doc:kb-qdrant-eco §2 生态 (kb)）\n- **[E11]** Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。（来源 [S11]：doc:kb-qdrant-cost §3 成本 (kb)）\n- **[E12]** Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。（来源 [S12]：doc:kb-qdrant-maturity §4 成熟度 (kb)）\n- **[E13]** 社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。（来源 [S13]：https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** 向量库公开基准快照（演示数据） — doc:kb-vdb-bench §5 基准 (kb)\n- **[S2]** Milvus 性能架构（演示快照） — doc:kb-milvus-perf §1 架构与延迟 (kb)\n- **[S3]** Accelerating Milvus with NVIDIA CAGRA GPU Index — https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)\n- **[S4]** Milvus 生态与集成（演示快照） — doc:kb-milvus-eco §2 生态 (kb)\n- **[S5]** Milvus 部署与成本（演示快照） — doc:kb-milvus-cost §3 成本 (kb)\n- **[S6]** Zilliz Cloud Pricing — https://zilliz.com/pricing 2025-01-15 (web)\n- **[S7]** Milvus 成熟度（演示快照） — doc:kb-milvus-maturity §4 成熟度 (kb)\n- **[S8]** Qdrant Documentation - Distributed Deployment — https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)\n- **[S9]** Qdrant 性能架构（演示快照） — doc:kb-qdrant-perf §1 架构与延迟 (kb)\n- **[S10]** Qdrant 生态与集成（演示快照） — doc:kb-qdrant-eco §2 生态 (kb)\n- **[S11]** Qdrant 部署与成本（演示快照） — doc:kb-qdrant-cost §3 成本 (kb)\n- **[S12]** Qdrant 成熟度（演示快照） — doc:kb-qdrant-maturity §4 成熟度 (kb)\n- **[S13]** Qdrant vs Milvus for a 10M-vector RAG app? — https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)\n",
+        "final_markdown": "# 技术选型研究报告\n\n> 研究问题：RAG 系统的向量库选 Qdrant 还是 Milvus？\n\n## 结论摘要\n\n**Qdrant**：性能：Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8]；生态：Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10]；成本：Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11]；成熟度：Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12]。\n\n**Milvus**：性能：VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1]；生态：Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4]；成本：Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5]；成熟度：Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7]。\n\n## 分维度对比\n\n| 维度 | Qdrant | Milvus |\n|---|---|---|\n| 性能 | Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。 [E8] | VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）； [E1] |\n| 生态 | Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。 [E10] | Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。 [E4] |\n| 成本 | Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。 [E11] | Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。 [E5] |\n| 成熟度 | Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。 [E12] | Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。 [E7] |\n\n## 证据明细\n\n- **[E1]** VectorDBBench 2025 年快照（演示整理）：千万级 768 维数据集下，Qdrant 单机 QPS 约 1200-1800，Milvus 集群 QPS 约 2000-4000（6 节点）；（来源 [S1]：doc:kb-vdb-bench §5 基准 (kb)）\n- **[E2]** Milvus 采用存算分离的云原生架构，支持十亿级向量的分布式检索。（来源 [S2]：doc:kb-milvus-perf §1 架构与延迟 (kb)）\n- **[E3]** GPU 索引让亿级向量检索吞吐提升 10 倍量级。（来源 [S3]：https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)）\n- **[E4]** Milvus 是 LF AI & DATA 基金会毕业项目，GitHub Star 超过 30k。（来源 [S4]：doc:kb-milvus-eco §2 生态 (kb)）\n- **[E5]** Milvus 分布式版依赖 etcd、对象存储（MinIO/S3）与消息队列（Pulsar/Kafka）三个外部组件，最小生产集群通常需要 6-10 个节点规格。（来源 [S5]：doc:kb-milvus-cost §3 成本 (kb)）\n- **[E6]** 托管 Milvus 按存储与 CU 计费，起步价高于自托管。（来源 [S6]：https://zilliz.com/pricing 2025-01-15 (web)）\n- **[E7]** Milvus 2019 年开源，是最早的国产开源向量数据库，银行、电信等大规模生产案例公开可查（亿级向量场景多）。（来源 [S7]：doc:kb-milvus-maturity §4 成熟度 (kb)）\n- **[E8]** Qdrant 单机即可承载千万级向量，分片集群用于横向扩展读写吞吐。（来源 [S8]：https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)）\n- **[E9]** Qdrant 以 Rust 实现，单节点默认使用 HNSW 索引，官方文档声称在 100 万条 768 维向量上 P99 查询延迟约 3-10ms（取决于过滤条件与硬件）。（来源 [S9]：doc:kb-qdrant-perf §1 架构与延迟 (kb)）\n- **[E10]** Qdrant 提供官方 Python/Go/Rust/JS 等 10+ 语言客户端，与 LangChain、LlamaIndex 均有官方维护的 VectorStore 适配器。（来源 [S10]：doc:kb-qdrant-eco §2 生态 (kb)）\n- **[E11]** Qdrant 采用 Apache-2.0 协议，开源版无功能阉割。（来源 [S11]：doc:kb-qdrant-cost §3 成本 (kb)）\n- **[E12]** Qdrant 2017 年启动，2021 年 v1.0 前 API 曾有破坏性变更，1.x 后保持稳定版本节奏（约每月一版）。（来源 [S12]：doc:kb-qdrant-maturity §4 成熟度 (kb)）\n- **[E13]** 社区共识：千万级以下选 Qdrant 省心，需要分布式与 GPU 再上 Milvus。（来源 [S13]：https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** 向量库公开基准快照（演示数据） — doc:kb-vdb-bench §5 基准 (kb)\n- **[S2]** Milvus 性能架构（演示快照） — doc:kb-milvus-perf §1 架构与延迟 (kb)\n- **[S3]** Accelerating Milvus with NVIDIA CAGRA GPU Index — https://milvus.io/blog/accelerate-milvus-with-cagra.md 2024-06-12 (web)\n- **[S4]** Milvus 生态与集成（演示快照） — doc:kb-milvus-eco §2 生态 (kb)\n- **[S5]** Milvus 部署与成本（演示快照） — doc:kb-milvus-cost §3 成本 (kb)\n- **[S6]** Zilliz Cloud Pricing — https://zilliz.com/pricing 2025-01-15 (web)\n- **[S7]** Milvus 成熟度（演示快照） — doc:kb-milvus-maturity §4 成熟度 (kb)\n- **[S8]** Qdrant Documentation - Distributed Deployment — https://qdrant.tech/documentation/guides/distributed_deployment/ 2025-03-01 (web)\n- **[S9]** Qdrant 性能架构（演示快照） — doc:kb-qdrant-perf §1 架构与延迟 (kb)\n- **[S10]** Qdrant 生态与集成（演示快照） — doc:kb-qdrant-eco §2 生态 (kb)\n- **[S11]** Qdrant 部署与成本（演示快照） — doc:kb-qdrant-cost §3 成本 (kb)\n- **[S12]** Qdrant 成熟度（演示快照） — doc:kb-qdrant-maturity §4 成熟度 (kb)\n- **[S13]** Qdrant vs Milvus for a 10M-vector RAG app? — https://www.reddit.com/r/vector_database/comments/selection_2025/ 2025-05-20 (web)\n",
+        "diff": "",
+        "invalid_citation_ids": [],
+        "rewrite_attempted": false,
+        "rewrite_accepted": null,
+        "rewrite_rejected_reason": null,
+        "claims_checked": 0,
+        "claims_quarantined": 0,
+        "actions": [
+          {
+            "action": "not_run",
+            "detail": "离线模板合成，无模型引用需要校验"
+          }
+        ],
+        "unverified_claims": [],
+        "fallback_used": false,
+        "fail_closed": false
+      },
+      "unverified_claims": [],
+      "evidence_disposition": {
+        "adopted": 13,
+        "excluded": 9,
+        "excluded_reasons": [
+          "duplicate_source"
+        ]
+      }
+    },
+    "insufficient": {
+      "case_id": "insufficient",
+      "title": "信息不足：领域外问题",
+      "question": "怎么评估一个开源项目的社区健康度？",
+      "run_id": "demo-insufficient",
+      "fault_injection": null,
+      "constraint_check": null,
+      "controlled_fixture": null,
+      "fixture_note": null,
+      "kb_backend": "InProcessKBClient",
+      "report_id": "demo-insufficient",
+      "routes_used": [],
+      "routes_attempted": [
+        "kb",
+        "web"
+      ],
+      "degraded": false,
+      "plan_rounds": 1,
+      "step_count": 4,
+      "information_gaps": [
+        "问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。"
+      ],
+      "evidence_count": 0,
+      "source_count": 0,
+      "trace_event_count": 11,
+      "token_usage": 0,
+      "plan_event_count": 1,
+      "dispatch_event_count": 1,
+      "constraint_summary": {
+        "verdict": "not_checked",
+        "recommended_objects": [],
+        "excluded": {},
+        "unknown_objects": [],
+        "findings": [],
+        "gaps": [],
+        "checked_objects": []
+      },
+      "guard_audit": {
+        "ran": false,
+        "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：怎么评估一个开源项目的社区健康度？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- 问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。",
+        "final_markdown": "# 技术选型研究报告\n\n> 研究问题：怎么评估一个开源项目的社区健康度？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- 问题未包含可核实的研究对象，或当前知识域未覆盖该问题；本轮为泛化检索，结论仅作线索，需补充对象、约束与时间范围后再判断。",
+        "diff": "",
+        "invalid_citation_ids": [],
+        "rewrite_attempted": false,
+        "rewrite_accepted": null,
+        "rewrite_rejected_reason": null,
+        "claims_checked": 0,
+        "claims_quarantined": 0,
+        "actions": [
+          {
+            "action": "not_run",
+            "detail": "离线模板合成，无模型引用需要校验"
+          }
+        ],
+        "unverified_claims": [],
+        "fallback_used": false,
+        "fail_closed": false
+      },
+      "unverified_claims": [],
+      "evidence_disposition": {
+        "adopted": 0,
+        "excluded": 12,
+        "excluded_reasons": [
+          "unscoped_question"
+        ]
+      }
+    },
+    "failure": {
+      "case_id": "failure",
+      "title": "真实失败：两路检索均失败（故障注入）",
+      "question": "Qdrant 和 Milvus 哪个更适合生产环境？",
+      "run_id": "demo-failure",
+      "fault_injection": {
+        "kb_client": "ConnectionError('demo fault injection: MCP KB connection reset')",
+        "search_provider": "TimeoutError('demo fault injection: search API timeout')",
+        "tool_max_retries": 1,
+        "note": "故障由脚本显式注入，用于展示重试、降级、缺口与 Trace；不代表真实线上事故。"
+      },
+      "constraint_check": null,
+      "controlled_fixture": null,
+      "fixture_note": null,
+      "kb_backend": "FaultyKBClient（注入）",
+      "report_id": "demo-failure",
+      "routes_used": [],
+      "routes_attempted": [
+        "kb",
+        "web"
+      ],
+      "degraded": true,
+      "plan_rounds": 1,
+      "step_count": 4,
+      "information_gaps": [
+        "Qdrant 缺少维度证据：性能、生态、成本、成熟度",
+        "Milvus 缺少维度证据：性能、生态、成本、成熟度",
+        "kb 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset",
+        "web 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout",
+        "kb 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset",
+        "web 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout"
+      ],
+      "evidence_count": 0,
+      "source_count": 0,
+      "trace_event_count": 23,
+      "token_usage": 0,
+      "plan_event_count": 1,
+      "dispatch_event_count": 1,
+      "constraint_summary": {
+        "verdict": "not_checked",
+        "recommended_objects": [],
+        "excluded": {},
+        "unknown_objects": [],
+        "findings": [],
+        "gaps": [],
+        "checked_objects": []
+      },
+      "guard_audit": {
+        "ran": false,
+        "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：Qdrant 和 Milvus 哪个更适合生产环境？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- Qdrant 缺少维度证据：性能、生态、成本、成熟度\n- Milvus 缺少维度证据：性能、生态、成本、成熟度\n- kb 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset\n- web 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout\n- kb 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset\n- web 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout",
+        "final_markdown": "# 技术选型研究报告\n\n> 研究问题：Qdrant 和 Milvus 哪个更适合生产环境？\n\n## 结论摘要\n\n本轮检索未获得可用证据，无法给出有依据的结论。\n\n## 信息缺口\n\n- Qdrant 缺少维度证据：性能、生态、成本、成熟度\n- Milvus 缺少维度证据：性能、生态、成本、成熟度\n- kb 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset\n- web 路检索失败（已降级）：Qdrant 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout\n- kb 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: MCP KB connection reset\n- web 路检索失败（已降级）：Milvus 向量数据库 — 第2次尝试失败: demo fault injection: search API timeout",
+        "diff": "",
+        "invalid_citation_ids": [],
+        "rewrite_attempted": false,
+        "rewrite_accepted": null,
+        "rewrite_rejected_reason": null,
+        "claims_checked": 0,
+        "claims_quarantined": 0,
+        "actions": [
+          {
+            "action": "not_run",
+            "detail": "离线模板合成，无模型引用需要校验"
+          }
+        ],
+        "unverified_claims": [],
+        "fallback_used": false,
+        "fail_closed": false
+      },
+      "unverified_claims": [],
+      "evidence_disposition": {
+        "adopted": 0,
+        "excluded": 0,
+        "excluded_reasons": []
+      }
+    },
+    "constraints": {
+      "case_id": "constraints",
+      "title": "约束真正影响结论（离线合成 fixture）",
+      "question": "我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？",
+      "run_id": "demo-constraints",
+      "fault_injection": null,
+      "constraint_check": null,
+      "controlled_fixture": true,
+      "fixture_note": "这些名称仅作为合成 fixture 中的评测对象，结构化属性为测试构造，不代表同名真实产品的真实能力，也不构成真实技术选型建议。",
+      "kb_backend": "InProcessKBClient",
+      "report_id": "demo-constraints",
+      "routes_used": [
+        "kb"
+      ],
+      "routes_attempted": [
+        "kb",
+        "web"
+      ],
+      "degraded": false,
+      "plan_rounds": 1,
+      "step_count": 4,
+      "information_gaps": [],
+      "evidence_count": 14,
+      "source_count": 14,
+      "trace_event_count": 19,
+      "token_usage": 0,
+      "plan_event_count": 1,
+      "dispatch_event_count": 1,
+      "constraint_summary": {
+        "verdict": "recommend",
+        "recommended_objects": [
+          "pgvector"
+        ],
+        "excluded": {
+          "atlas": [
+            "C5"
+          ],
+          "helios": [
+            "C2",
+            "C3",
+            "C5"
+          ]
+        },
+        "unknown_objects": [],
+        "findings": [
+          {
+            "constraint_id": "C1",
+            "object_name": "atlas",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E1",
+              "E2",
+              "E3",
+              "E4"
+            ],
+            "detail": "支持上限 10,000,000 / 要求 5,000,000"
+          },
+          {
+            "constraint_id": "C2",
+            "object_name": "atlas",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E1",
+              "E2",
+              "E3",
+              "E4"
+            ],
+            "detail": "最低团队 2 人 / 可用 5 人"
+          },
+          {
+            "constraint_id": "C3",
+            "object_name": "atlas",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E1",
+              "E2",
+              "E3",
+              "E4"
+            ],
+            "detail": "成本等级 0 / 上限 0"
+          },
+          {
+            "constraint_id": "C4",
+            "object_name": "atlas",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E1",
+              "E2",
+              "E3",
+              "E4"
+            ],
+            "detail": "支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted"
+          },
+          {
+            "constraint_id": "C5",
+            "object_name": "atlas",
+            "status": "violated",
+            "evidence_ids": [
+              "E1",
+              "E2",
+              "E3",
+              "E4"
+            ],
+            "detail": "需要新基础设施=True"
+          },
+          {
+            "constraint_id": "C1",
+            "object_name": "helios",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E5",
+              "E6",
+              "E7",
+              "E8"
+            ],
+            "detail": "支持上限 100,000,000 / 要求 5,000,000"
+          },
+          {
+            "constraint_id": "C2",
+            "object_name": "helios",
+            "status": "violated",
+            "evidence_ids": [
+              "E5",
+              "E6",
+              "E7",
+              "E8"
+            ],
+            "detail": "最低团队 10 人 / 可用 5 人"
+          },
+          {
+            "constraint_id": "C3",
+            "object_name": "helios",
+            "status": "violated",
+            "evidence_ids": [
+              "E5",
+              "E6",
+              "E7",
+              "E8"
+            ],
+            "detail": "成本等级 2 / 上限 0"
+          },
+          {
+            "constraint_id": "C4",
+            "object_name": "helios",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E5",
+              "E6",
+              "E7",
+              "E8"
+            ],
+            "detail": "支持部署方式 ['self-hosted'] / 要求 self-hosted"
+          },
+          {
+            "constraint_id": "C5",
+            "object_name": "helios",
+            "status": "violated",
+            "evidence_ids": [
+              "E5",
+              "E6",
+              "E7",
+              "E8"
+            ],
+            "detail": "需要新基础设施=True"
+          },
+          {
+            "constraint_id": "C1",
+            "object_name": "pgvector",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E11",
+              "E12",
+              "E13",
+              "E14"
+            ],
+            "detail": "支持上限 10,000,000 / 要求 5,000,000"
+          },
+          {
+            "constraint_id": "C2",
+            "object_name": "pgvector",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E11",
+              "E12",
+              "E13",
+              "E14"
+            ],
+            "detail": "最低团队 2 人 / 可用 5 人"
+          },
+          {
+            "constraint_id": "C3",
+            "object_name": "pgvector",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E11",
+              "E12",
+              "E13",
+              "E14"
+            ],
+            "detail": "成本等级 0 / 上限 0"
+          },
+          {
+            "constraint_id": "C4",
+            "object_name": "pgvector",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E11",
+              "E12",
+              "E13",
+              "E14"
+            ],
+            "detail": "支持部署方式 ['self-hosted'] / 要求 self-hosted"
+          },
+          {
+            "constraint_id": "C5",
+            "object_name": "pgvector",
+            "status": "satisfied",
+            "evidence_ids": [
+              "E11",
+              "E12",
+              "E13",
+              "E14"
+            ],
+            "detail": "需要新基础设施=False"
+          }
+        ],
+        "gaps": [],
+        "checked_objects": [
+          "atlas",
+          "helios",
+          "pgvector"
+        ]
+      },
+      "guard_audit": {
+        "ran": false,
+        "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n**Helios**：性能：Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5]；生态：Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6]；成本：Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7]；成熟度：Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8]。\n\n**pgvector**：性能：pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11]；生态：pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12]；成本：pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13]；成熟度：pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14]。\n\n**Nebula**：性能：Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9]；成熟度：Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10]。\n\n## 约束核对\n\n- [C1] 500 万条 768 维向量：Atlas 满足（支持上限 10,000,000 / 要求 5,000,000）；Helios 满足（支持上限 100,000,000 / 要求 5,000,000）；pgvector 满足（支持上限 10,000,000 / 要求 5,000,000）\n- [C2] 5 人：Atlas 满足（最低团队 2 人 / 可用 5 人）；Helios 违反（最低团队 10 人 / 可用 5 人）；pgvector 满足（最低团队 2 人 / 可用 5 人）\n- [C3] 低成本/预算有限：Atlas 满足（成本等级 0 / 上限 0）；Helios 违反（成本等级 2 / 上限 0）；pgvector 满足（成本等级 0 / 上限 0）\n- [C4] 自托管：Atlas 满足（支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted）；Helios 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）；pgvector 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）\n- [C5] 不引入新数据库/中间件：Atlas 违反（需要新基础设施=True）；Helios 违反（需要新基础设施=True）；pgvector 满足（需要新基础设施=False）\n\n**约束结论**：在给定约束下，唯一满足全部可核验约束的是 pgvector；Atlas 违反 C5；Helios 违反 C2, C3, C5。\n\n## 分维度对比\n\n| 维度 | Atlas | Helios | pgvector | Nebula |\n|---|---|---|---|---|\n| 性能 | Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1] | Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5] | pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11] | Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9] |\n| 生态 | Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2] | Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6] | pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12] | —（本轮无证据） |\n| 成本 | Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3] | Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7] | pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13] | —（本轮无证据） |\n| 成熟度 | Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4] | Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8] | pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14] | Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10] |\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n- **[E5]** Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；（来源 [S5]：doc:fixture-helios-perf §1 容量 (kb)）\n- **[E6]** Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；（来源 [S6]：doc:fixture-helios-eco §2 生态 (kb)）\n- **[E7]** Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；（来源 [S7]：doc:fixture-helios-cost §3 成本 (kb)）\n- **[E8]** Helios 在大型企业有亿级向量案例，版本节奏稳定；（来源 [S8]：doc:fixture-helios-maturity §4 成熟度 (kb)）\n- **[E9]** Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。（来源 [S9]：doc:fixture-nebula-perf §1 容量 (kb)）\n- **[E10]** Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。（来源 [S10]：doc:fixture-nebula-maturity §4 成熟度 (kb)）\n- **[E11]** pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；（来源 [S11]：doc:fixture-pgvector-perf §1 容量 (kb)）\n- **[E12]** pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。（来源 [S12]：doc:fixture-pgvector-eco §2 生态 (kb)）\n- **[E13]** pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；（来源 [S13]：doc:fixture-pgvector-cost §3 成本 (kb)）\n- **[E14]** pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；（来源 [S14]：doc:fixture-pgvector-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n- **[S5]** Helios 性能与容量（离线 fixture） — doc:fixture-helios-perf §1 容量 (kb)\n- **[S6]** Helios 生态（离线 fixture） — doc:fixture-helios-eco §2 生态 (kb)\n- **[S7]** Helios 成本（离线 fixture） — doc:fixture-helios-cost §3 成本 (kb)\n- **[S8]** Helios 成熟度（离线 fixture） — doc:fixture-helios-maturity §4 成熟度 (kb)\n- **[S9]** Nebula 性能（离线 fixture，缺少结构化属性） — doc:fixture-nebula-perf §1 容量 (kb)\n- **[S10]** Nebula 成熟度（离线 fixture，缺少结构化属性） — doc:fixture-nebula-maturity §4 成熟度 (kb)\n- **[S11]** pgvector 性能与容量（离线 fixture） — doc:fixture-pgvector-perf §1 容量 (kb)\n- **[S12]** pgvector 生态（离线 fixture） — doc:fixture-pgvector-eco §2 生态 (kb)\n- **[S13]** pgvector 成本（离线 fixture） — doc:fixture-pgvector-cost §3 成本 (kb)\n- **[S14]** pgvector 成熟度（离线 fixture） — doc:fixture-pgvector-maturity §4 成熟度 (kb)\n",
+        "final_markdown": "# 技术选型研究报告\n\n> 研究问题：我们已有 PostgreSQL 团队，准备上线 500 万条 768 维向量的 RAG，团队 5 人、自托管、预算有限，并尽量不引入新数据库。Atlas、Helios 和 pgvector 应该选哪个？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n**Helios**：性能：Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5]；生态：Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6]；成本：Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7]；成熟度：Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8]。\n\n**pgvector**：性能：pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11]；生态：pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12]；成本：pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13]；成熟度：pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14]。\n\n**Nebula**：性能：Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9]；成熟度：Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10]。\n\n## 约束核对\n\n- [C1] 500 万条 768 维向量：Atlas 满足（支持上限 10,000,000 / 要求 5,000,000）；Helios 满足（支持上限 100,000,000 / 要求 5,000,000）；pgvector 满足（支持上限 10,000,000 / 要求 5,000,000）\n- [C2] 5 人：Atlas 满足（最低团队 2 人 / 可用 5 人）；Helios 违反（最低团队 10 人 / 可用 5 人）；pgvector 满足（最低团队 2 人 / 可用 5 人）\n- [C3] 低成本/预算有限：Atlas 满足（成本等级 0 / 上限 0）；Helios 违反（成本等级 2 / 上限 0）；pgvector 满足（成本等级 0 / 上限 0）\n- [C4] 自托管：Atlas 满足（支持部署方式 ['managed-cloud', 'self-hosted'] / 要求 self-hosted）；Helios 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）；pgvector 满足（支持部署方式 ['self-hosted'] / 要求 self-hosted）\n- [C5] 不引入新数据库/中间件：Atlas 违反（需要新基础设施=True）；Helios 违反（需要新基础设施=True）；pgvector 满足（需要新基础设施=False）\n\n**约束结论**：在给定约束下，唯一满足全部可核验约束的是 pgvector；Atlas 违反 C5；Helios 违反 C2, C3, C5。\n\n## 分维度对比\n\n| 维度 | Atlas | Helios | pgvector | Nebula |\n|---|---|---|---|---|\n| 性能 | Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1] | Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量； [E5] | pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW； [E11] | Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。 [E9] |\n| 生态 | Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2] | Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发； [E6] | pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。 [E12] | —（本轮无证据） |\n| 成本 | Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3] | Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本； [E7] | pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源； [E13] | —（本轮无证据） |\n| 成熟度 | Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4] | Helios 在大型企业有亿级向量案例，版本节奏稳定； [E8] | pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新； [E14] | Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。 [E10] |\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n- **[E5]** Helios 是分布式向量数据库，官方标称支持 1 亿条以上向量；（来源 [S5]：doc:fixture-helios-perf §1 容量 (kb)）\n- **[E6]** Helios 提供多语言 SDK 与连接器，适合已有平台团队做二次开发；（来源 [S6]：doc:fixture-helios-eco §2 生态 (kb)）\n- **[E7]** Helios 分布式版需要 8-12 个节点，存储与消息队列带来额外成本；（来源 [S7]：doc:fixture-helios-cost §3 成本 (kb)）\n- **[E8]** Helios 在大型企业有亿级向量案例，版本节奏稳定；（来源 [S8]：doc:fixture-helios-maturity §4 成熟度 (kb)）\n- **[E9]** Nebula 声称支持大规模向量检索，但公开资料没有给出可核验的容量上限与最低团队配置。（来源 [S9]：doc:fixture-nebula-perf §1 容量 (kb)）\n- **[E10]** Nebula 的版本历史与生产案例缺少公开证据，成熟度无法核验。（来源 [S10]：doc:fixture-nebula-maturity §4 成熟度 (kb)）\n- **[E11]** pgvector 是 PostgreSQL 扩展，官方建议单表千万级向量以内使用 HNSW；（来源 [S11]：doc:fixture-pgvector-perf §1 容量 (kb)）\n- **[E12]** pgvector 直接复用 PostgreSQL 的连接池、备份、权限与监控，已有 PostgreSQL 团队无需学习新的数据库运维体系。（来源 [S12]：doc:fixture-pgvector-eco §2 生态 (kb)）\n- **[E13]** pgvector 不需要新增数据库集群，复用现有 PostgreSQL 资源；（来源 [S13]：doc:fixture-pgvector-cost §3 成本 (kb)）\n- **[E14]** pgvector 由 PostgreSQL 社区维护，版本随 PostgreSQL 生态更新；（来源 [S14]：doc:fixture-pgvector-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n- **[S5]** Helios 性能与容量（离线 fixture） — doc:fixture-helios-perf §1 容量 (kb)\n- **[S6]** Helios 生态（离线 fixture） — doc:fixture-helios-eco §2 生态 (kb)\n- **[S7]** Helios 成本（离线 fixture） — doc:fixture-helios-cost §3 成本 (kb)\n- **[S8]** Helios 成熟度（离线 fixture） — doc:fixture-helios-maturity §4 成熟度 (kb)\n- **[S9]** Nebula 性能（离线 fixture，缺少结构化属性） — doc:fixture-nebula-perf §1 容量 (kb)\n- **[S10]** Nebula 成熟度（离线 fixture，缺少结构化属性） — doc:fixture-nebula-maturity §4 成熟度 (kb)\n- **[S11]** pgvector 性能与容量（离线 fixture） — doc:fixture-pgvector-perf §1 容量 (kb)\n- **[S12]** pgvector 生态（离线 fixture） — doc:fixture-pgvector-eco §2 生态 (kb)\n- **[S13]** pgvector 成本（离线 fixture） — doc:fixture-pgvector-cost §3 成本 (kb)\n- **[S14]** pgvector 成熟度（离线 fixture） — doc:fixture-pgvector-maturity §4 成熟度 (kb)\n",
+        "diff": "",
+        "invalid_citation_ids": [],
+        "rewrite_attempted": false,
+        "rewrite_accepted": null,
+        "rewrite_rejected_reason": null,
+        "claims_checked": 0,
+        "claims_quarantined": 0,
+        "actions": [
+          {
+            "action": "not_run",
+            "detail": "离线模板合成，无模型引用需要校验"
+          }
+        ],
+        "unverified_claims": [],
+        "fallback_used": false,
+        "fail_closed": false
+      },
+      "unverified_claims": [],
+      "evidence_disposition": {
+        "adopted": 14,
+        "excluded": 22,
+        "excluded_reasons": [
+          "duplicate_source"
+        ]
+      }
+    },
+    "replan": {
+      "case_id": "replan",
+      "title": "确定性 replan：首轮缺口到第二轮补充检索",
+      "question": "Atlas 向量数据库的性能、生态、成本和成熟度怎么样？",
+      "run_id": "demo-replan",
+      "fault_injection": null,
+      "constraint_check": null,
+      "controlled_fixture": true,
+      "fixture_note": "脚本化 KB 只返回部分维度；仅证明离线 replan 行为与 Trace，不代表在线 replan 质量。",
+      "kb_backend": "ScriptedKBClient（fixture）",
+      "report_id": "demo-replan",
+      "routes_used": [
+        "kb"
+      ],
+      "routes_attempted": [
+        "kb",
+        "web"
+      ],
+      "degraded": false,
+      "plan_rounds": 2,
+      "step_count": 7,
+      "information_gaps": [],
+      "evidence_count": 4,
+      "source_count": 4,
+      "trace_event_count": 23,
+      "token_usage": 0,
+      "plan_event_count": 2,
+      "dispatch_event_count": 2,
+      "constraint_summary": {
+        "verdict": "not_checked",
+        "recommended_objects": [],
+        "excluded": {},
+        "unknown_objects": [],
+        "findings": [],
+        "gaps": [],
+        "checked_objects": []
+      },
+      "guard_audit": {
+        "ran": false,
+        "raw_markdown": "# 技术选型研究报告\n\n> 研究问题：Atlas 向量数据库的性能、生态、成本和成熟度怎么样？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n",
+        "final_markdown": "# 技术选型研究报告\n\n> 研究问题：Atlas 向量数据库的性能、生态、成本和成熟度怎么样？\n\n## 结论摘要\n\n**Atlas**：性能：Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量； [E1]；生态：Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器； [E2]；成本：Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维； [E3]；成熟度：Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主； [E4]。\n\n## 证据明细\n\n- **[E1]** Atlas 是单机专用向量库，官方标称单机支持 1000 万条 768 维向量；（来源 [S1]：doc:fixture-atlas-perf §1 容量 (kb)）\n- **[E2]** Atlas 提供 Python/Go/Rust 客户端和常见 Agent 框架适配器；（来源 [S2]：doc:fixture-atlas-eco §2 生态 (kb)）\n- **[E3]** Atlas 社区版免费，单机 16GB 内存可承载百万级向量，2 人团队可完成日常运维；（来源 [S3]：doc:fixture-atlas-cost §3 成本 (kb)）\n- **[E4]** Atlas 2021 年发布 1.0，社区规模中等，生产案例以百万级 RAG 为主；（来源 [S4]：doc:fixture-atlas-maturity §4 成熟度 (kb)）\n\n## 信息缺口\n\n- 无（本轮检索已覆盖计划的全部维度）\n\n## 参考来源\n\n- **[S1]** Atlas 性能与容量（离线 fixture） — doc:fixture-atlas-perf §1 容量 (kb)\n- **[S2]** Atlas 生态（离线 fixture） — doc:fixture-atlas-eco §2 生态 (kb)\n- **[S3]** Atlas 成本（离线 fixture） — doc:fixture-atlas-cost §3 成本 (kb)\n- **[S4]** Atlas 成熟度（离线 fixture） — doc:fixture-atlas-maturity §4 成熟度 (kb)\n",
+        "diff": "",
+        "invalid_citation_ids": [],
+        "rewrite_attempted": false,
+        "rewrite_accepted": null,
+        "rewrite_rejected_reason": null,
+        "claims_checked": 0,
+        "claims_quarantined": 0,
+        "actions": [
+          {
+            "action": "not_run",
+            "detail": "离线模板合成，无模型引用需要校验"
+          }
+        ],
+        "unverified_claims": [],
+        "fallback_used": false,
+        "fail_closed": false
+      },
+      "unverified_claims": [],
+      "evidence_disposition": {
+        "adopted": 4,
+        "excluded": 4,
+        "excluded_reasons": [
+          "duplicate_source"
+        ]
+      }
+    },
+    "guard": {
+      "case_id": "guard",
+      "title": "引用 Guard：隔离非法/无引用结论（受控模型输出）",
+      "question": "Qdrant 和 Milvus 怎么选？",
+      "run_id": "demo-guard",
+      "fault_injection": null,
+      "constraint_check": null,
+      "controlled_fixture": true,
+      "fixture_note": "模型输出由脚本固定注入，包含合法引用、非法引用、无引用事实性结论；用于验证 Guard 行为，不是在线模型效果。",
+      "kb_backend": "InProcessKBClient",
+      "report_id": "demo-guard",
+      "routes_used": [
+        "kb",
+        "web"
+      ],
+      "routes_attempted": [
+        "kb",
+        "web"
+      ],
+      "degraded": false,
+      "plan_rounds": 1,
+      "step_count": 4,
+      "information_gaps": [],
+      "evidence_count": 13,
+      "source_count": 13,
+      "trace_event_count": 16,
+      "token_usage": 0,
+      "plan_event_count": 1,
+      "dispatch_event_count": 1,
+      "constraint_summary": {
+        "verdict": "not_checked",
+        "recommended_objects": [],
+        "excluded": {},
+        "unknown_objects": [],
+        "findings": [],
+        "gaps": [],
+        "checked_objects": []
+      },
+      "guard_audit": {
+        "ran": true,
+        "raw_markdown": "# 技术选型研究报告（模型原始输出，受控 fixture）\n\n## 结论摘要\n\n根据证据 [E1]，该系统在千万级向量规模下有性能数据。\n\nMilvus 的 GPU 索引吞吐提升 10 倍 [E99]。\n\nQdrant 是最好的选择。\n",
+        "final_markdown": "# 技术选型研究报告（模型原始输出，受控 fixture）\n\n## 结论摘要\n\n根据证据 [E1]，该系统在千万级向量规模下有性能数据。\n",
+        "diff": "--- pre_guard\n+++ post_guard\n@@ -3,7 +3,3 @@\n ## 结论摘要\n \n 根据证据 [E1]，该系统在千万级向量规模下有性能数据。\n-\n-Milvus 的 GPU 索引吞吐提升 10 倍 [E99]。\n-\n-Qdrant 是最好的选择。",
+        "invalid_citation_ids": [
+          "E99"
+        ],
+        "rewrite_attempted": true,
+        "rewrite_accepted": false,
+        "rewrite_rejected_reason": "rewrite_still_invalid",
+        "claims_checked": 3,
+        "claims_quarantined": 2,
+        "actions": [
+          {
+            "action": "rewrite_rejected",
+            "detail": "rewrite_still_invalid"
+          },
+          {
+            "action": "claim_quarantined",
+            "detail": "隔离 2 条无法追溯的结论；未写入主报告"
+          }
+        ],
+        "unverified_claims": [
+          {
+            "location": "line#7",
+            "text": "Milvus 的 GPU 索引吞吐提升 10 倍 [E99]。",
+            "invalid_citation_ids": [
+              "E99"
+            ],
+            "valid_citation_ids": [],
+            "reason": "invalid_citation_after_rewrite",
+            "action": "quarantined"
+          },
+          {
+            "location": "line#9",
+            "text": "Qdrant 是最好的选择。",
+            "invalid_citation_ids": [],
+            "valid_citation_ids": [],
+            "reason": "missing_citation",
+            "action": "quarantined"
+          }
+        ],
+        "fallback_used": false,
+        "fail_closed": false
+      },
+      "unverified_claims": [
+        {
+          "location": "line#7",
+          "text": "Milvus 的 GPU 索引吞吐提升 10 倍 [E99]。",
+          "invalid_citation_ids": [
+            "E99"
+          ],
+          "valid_citation_ids": [],
+          "reason": "invalid_citation_after_rewrite",
+          "action": "quarantined"
+        },
+        {
+          "location": "line#9",
+          "text": "Qdrant 是最好的选择。",
+          "invalid_citation_ids": [],
+          "valid_citation_ids": [],
+          "reason": "missing_citation",
+          "action": "quarantined"
+        }
+      ],
+      "evidence_disposition": {
+        "adopted": 13,
+        "excluded": 9,
+        "excluded_reasons": [
+          "duplicate_source"
+        ]
+      }
+    }
+  }
+}

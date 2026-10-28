@@ -7,6 +7,7 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -20,6 +21,10 @@ class KBDocument(BaseModel):
     object_name: str = Field(default="", description="所属对比对象，如 qdrant")
     aspect: str = Field(default="general", description="研究维度 performance/ecosystem/cost/maturity")
     source_url: str | None = None
+    attributes: dict[str, Any] = Field(
+        default_factory=dict,
+        description="结构化属性（如 max_vectors/min_team/cost_tier），仅用于约束核验",
+    )
 
 
 def load_corpus(corpus_dir: Path) -> list[KBDocument]:

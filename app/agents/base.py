@@ -22,6 +22,7 @@ class SubAgentState(TypedDict, total=False):
     subtask: SubTask
     question: str
     trace_id: str
+    constraints: list  # list[Constraint]，随子任务派发，供审计与约束相关检索
     hits: list  # 检索中间产物（ScoredDoc / WebHit）
     evidences: list  # list[Evidence]
     route_failures: list  # list[dict]
@@ -102,6 +103,7 @@ def as_graph_node(compiled_subgraph: CompiledStateGraph) -> Callable[[dict], dic
                 "subtask": payload["subtask"],
                 "question": payload.get("question", ""),
                 "trace_id": payload.get("trace_id", ""),
+                "constraints": payload.get("constraints", []),
             }
         )
         return {

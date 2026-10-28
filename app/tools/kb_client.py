@@ -21,3 +21,10 @@ class InProcessKBClient:
 
     def search(self, query: str, top_k: int = 4, *, topic: str | None = None) -> list[ScoredDoc]:
         return self._retriever.search(query, top_k=top_k, topic=topic)
+
+
+class EmptyKBClient:
+    """Web-only 评测使用：显式关闭 KB 路，返回空结果而不是悄悄用演示语料。"""
+
+    def search(self, query: str, top_k: int = 4, *, topic: str | None = None) -> list[ScoredDoc]:
+        return []
